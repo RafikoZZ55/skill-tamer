@@ -1,1 +1,3 @@
 # skill-tamer
+
+Skill Tamer is an app where you gather talent cards and then level them up buy spending time on them, you can chose form ready presets or create your own. By upgrading cards you will be able gain achivmens and visualize your progress in a cool way. Your card will help yu defeat enemies (ill probably change that to something better). To level up cards you will start a timer on your phone and evry 15 minute you will have to tap a screen to check if you are not cheating the system, at the end of each session you will have to take foto yourself or the thing that you were working on this will help you track your progress and create a roadmap for you.!! :>
