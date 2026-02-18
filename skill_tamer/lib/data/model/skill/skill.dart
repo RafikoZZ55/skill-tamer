@@ -1,31 +1,26 @@
-import 'package:skill_tamer/data/model/enum/skill_attribute.dart';
+import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 
 class Skill {
   int xpGained;
   final SkillType type;
-  Map<SkillAttribute, int> attributes;
+  Map<SkillAttributeType, int> attributes;
+  int unspentAttributePoints;
 
   Skill({
     int? xpGained,
     required this.type,
-    Map<SkillAttribute, int>? attributes,
+    Map<SkillAttributeType, int>? attributes,
+    int? unspentAttributePoints,
   })  : xpGained = xpGained ?? 0,
-        attributes = attributes ?? type.baseAttributes;
-
-  int calculateLevel(){
-    return 1;
-  }
-
-  int calculateExpToNextLevel(){
-    return 1;
-  }
+        attributes = attributes ?? type.baseAttributes,
+        unspentAttributePoints = unspentAttributePoints ?? 0;
 
 
   Skill copyWith({
     int? xpGained,
     SkillType? type,
-    Map<SkillAttribute, int>? attributes
+    Map<SkillAttributeType, int>? attributes
   }) {
     return Skill(
       type: type ?? this.type,
@@ -33,4 +28,19 @@ class Skill {
       attributes: attributes ?? Map.from(this.attributes),
     );
   }
+
+int getLevel() {
+  int level = 0;
+  int xpLeft = xpGained;
+  int xpForNext = 3000;
+  double growth = 1.15;
+
+  while (level < 15 && xpLeft >= xpForNext) {
+    xpLeft -= xpForNext;
+    level++;
+    xpForNext = (xpForNext * growth).round();
+  }
+
+  return level;
+}
 }

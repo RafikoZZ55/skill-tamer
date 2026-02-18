@@ -9,6 +9,25 @@ const HomePage({ super.key });
   Widget build(BuildContext context){
     return Scaffold(
       appBar: HomeAppBar(),
+      body: DefaultTabController(
+        length: 3, 
+        child: Column(
+          children: [
+
+            TabBarView(
+              children: [
+                
+              ]
+            ),
+
+            TabBar(
+              tabs: [
+
+              ]
+            )
+          ],
+        ),
+      )
     );
   }
 }
