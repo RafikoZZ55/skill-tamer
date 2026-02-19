@@ -20,12 +20,14 @@ class Skill {
   Skill copyWith({
     int? xpGained,
     SkillType? type,
-    Map<SkillAttributeType, int>? attributes
+    Map<SkillAttributeType, int>? attributes,
+    int? unspentAttributePoints
   }) {
     return Skill(
       type: type ?? this.type,
       xpGained: xpGained ?? this.xpGained,
       attributes: attributes ?? Map.from(this.attributes),
+      unspentAttributePoints: unspentAttributePoints ?? this.unspentAttributePoints,
     );
   }
 

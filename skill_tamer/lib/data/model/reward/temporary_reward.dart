@@ -8,9 +8,7 @@ abstract class TemporaryReward extends Reward {
   TemporaryReward({
     required this.duration,
     this.activationTime,
-    required super.description,
-    required super.icon,
-    required super.name,
+    required super.type,
     required super.isActive,
   });
 
