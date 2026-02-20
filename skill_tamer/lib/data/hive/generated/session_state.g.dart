@@ -18,23 +18,20 @@ class SessionStateAdapter extends TypeAdapter<SessionState> {
     };
     return SessionState(
       timeStarted: fields[0] as int,
-      sessionDuration: fields[1] as int,
-      lastSessionCheck: fields[2] as int,
-      sessionSkill: fields[3] as String,
+      lastSessionCheck: fields[1] as int,
+      sessionSkill: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, SessionState obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.timeStarted)
       ..writeByte(1)
-      ..write(obj.sessionDuration)
-      ..writeByte(2)
       ..write(obj.lastSessionCheck)
-      ..writeByte(3)
+      ..writeByte(2)
       ..write(obj.sessionSkill);
   }
 

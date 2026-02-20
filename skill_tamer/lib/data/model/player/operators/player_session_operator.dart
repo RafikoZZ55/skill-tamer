@@ -4,7 +4,6 @@ extension PlayerSessionOperator on Player {
   
   Player _generateSession({required SkillType skillType}){
     Session newSession = Session(
-      sessionDuration: skillType.recommendedSessionDuration.inMilliseconds, 
       timeStarted: DateTime.now().millisecondsSinceEpoch, 
       sessionSkill: skillType
       );

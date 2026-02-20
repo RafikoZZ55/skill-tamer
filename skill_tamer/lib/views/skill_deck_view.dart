@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skill_tamer/data/model/player/player.dart';
+import 'package:skill_tamer/components/skill_card.dart';
+import 'package:skill_tamer/data/model/skill/skill.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
 
 
@@ -14,10 +15,21 @@ class SkillDeckView extends ConsumerStatefulWidget {
 class _SkillDeckViewState extends ConsumerState<SkillDeckView> {
   @override
   Widget build(BuildContext context) {
-    Player player = ref.watch(playerProvider);
+    List<Skill> skills = ref.watch(playerProvider.select((p) => p.skills));
     
-    return Container(
-      child: Text("hi ${player.lastRefreshAt}, ${player.currentMission!.type.name}, ${player.nextMissionRefreshAt}"),
+    return Column(
+      children: [
+        Text("skills"),
+        Divider(),
+
+        Expanded(
+          child: GridView.count(
+            crossAxisCount: 2,
+            children: List.generate(skills.length, (index) => SkillCard(skillIndex: index)),
+          ),
+        ),
+
+      ],
     );
   }
 }

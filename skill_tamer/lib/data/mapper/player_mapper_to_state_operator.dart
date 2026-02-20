@@ -84,7 +84,6 @@ extension PlayerMapperToStateOperator on PlayerMapper {
   SessionState _toActiveSessionState({required Session sessionState}){
     return SessionState(
       timeStarted: sessionState.timeStarted, 
-      sessionDuration: sessionState.lastSessionCheck, 
       lastSessionCheck: sessionState.lastSessionCheck, 
       sessionSkill: sessionState.sessionSkill.name,
       );

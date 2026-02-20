@@ -7,6 +7,7 @@ import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/mapper/player_mapper.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/player/player.dart';
+import 'package:skill_tamer/data/model/session/session.dart';
 
 
 class PlayerController extends StateNotifier<Player> {

@@ -74,7 +74,6 @@ extension PlayerMapperFromStateOperator on PlayerMapper {
 
   Session _fromActiveSessionState({required SessionState sessionState}){
     return Session(
-      sessionDuration: sessionState.sessionDuration, 
       timeStarted: sessionState.timeStarted, 
       sessionSkill: SkillType.get(skillName: sessionState.sessionSkill),
       lastSessionCheck: sessionState.lastSessionCheck
