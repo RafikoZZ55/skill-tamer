@@ -29,7 +29,7 @@ extension PlayerMissionOperator on Player {
   }
 
   bool isMissionExpierd(){
-    return currentMissionRefreshAt > DateTime.now().millisecondsSinceEpoch;
+    return (nextMissionRefreshAt <= DateTime.now().millisecondsSinceEpoch);
   }
 
   Map<SkillAttributeType,int> calculateSkillAttributeBoost(){
@@ -47,8 +47,8 @@ extension PlayerMissionOperator on Player {
 
   Player refreshMission(){
     Mission newMission = _generateMission();
-    int newCurrentMissionRefreshAt = DateTime.now().millisecondsSinceEpoch + Duration(hours: 1).inMilliseconds;
-    return copyWith(currentMission: newMission, currentMissionRefreshAt: newCurrentMissionRefreshAt);
+    int newNextMissionRefreshAt = DateTime.now().millisecondsSinceEpoch + Duration(hours: 1).inMilliseconds;
+    return copyWith(currentMission: newMission, nextMissionRefreshAt: newNextMissionRefreshAt);
   }
 
 

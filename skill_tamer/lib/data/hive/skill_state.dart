@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'skill_state.g.dart';
+part 'generated/skill_state.g.dart';
 
 @HiveType(typeId: 0)
 class SkillState {

@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'session_state.g.dart';
+part 'generated/session_state.g.dart';
 
 @HiveType(typeId: 1)
 class SessionState {

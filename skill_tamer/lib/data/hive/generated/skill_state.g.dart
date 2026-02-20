@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'skill_state.dart';
+part of '../skill_state.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

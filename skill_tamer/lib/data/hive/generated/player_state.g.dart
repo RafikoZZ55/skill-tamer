@@ -21,7 +21,7 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       skills: (fields[1] as List).cast<SkillState>(),
       rewards: (fields[2] as List).cast<RewardState>(),
       lastRefreshAt: fields[3] as int,
-      currentMissionRefreshAt: fields[5] as int,
+      nextMissionRefreshAt: fields[5] as int,
       currentMission: fields[4] as MissionState?,
       activeSession: fields[6] as SessionState?,
     );
@@ -42,7 +42,7 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       ..writeByte(4)
       ..write(obj.currentMission)
       ..writeByte(5)
-      ..write(obj.currentMissionRefreshAt)
+      ..write(obj.nextMissionRefreshAt)
       ..writeByte(6)
       ..write(obj.activeSession);
   }

@@ -25,6 +25,23 @@ extension PlayerSkillOperator on Player {
       skills: newSkills,
     );
   }
+  
+
+  bool areSkillsEmpty(){
+    return skills.isEmpty;
+  }
+
+
+  Player refreshSkills(){
+    Player newPlayer = copyWith();
+    List<Skill> newSkills = [];
+
+    for(SkillType skillType in SkillType.values){
+      newSkills.add(Skill(type: skillType));
+    }
+    
+    return newPlayer.copyWith(skills: newSkills);
+  }
 
   
 }

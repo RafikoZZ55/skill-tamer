@@ -20,11 +20,11 @@ class Player {
   List<Reward> rewards;
   int lastRefreshAt;
   Mission? currentMission;
-  int currentMissionRefreshAt;
+  int nextMissionRefreshAt;
   Session? activeSession;
 
   Player({
-    required this.currentMissionRefreshAt,
+    required this.nextMissionRefreshAt,
     required this.xpGained,
     required this.skills,
     required this.rewards,
@@ -39,7 +39,7 @@ class Player {
       skills: [], 
       rewards: [], 
       lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
-      currentMissionRefreshAt: DateTime.now().millisecondsSinceEpoch,
+      nextMissionRefreshAt: DateTime.now().millisecondsSinceEpoch,
     );
   }
 
@@ -50,7 +50,7 @@ class Player {
     int? lastRefreshAt,
     Mission? currentMission,
     int? xpGained,
-    int? currentMissionRefreshAt
+    int? nextMissionRefreshAt
   }) {
     return Player(
       activeSession: activeSession ?? this.activeSession,
@@ -58,8 +58,8 @@ class Player {
       currentMission: currentMission ?? this.currentMission,
       skills: skills ?? List.from(this.skills),
       rewards: rewards ?? List.from(this.rewards),
-      lastRefreshAt: lastRefreshAt ?? DateTime.now().millisecondsSinceEpoch,
-      currentMissionRefreshAt: currentMissionRefreshAt ?? DateTime.now().millisecondsSinceEpoch, 
+      lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
+      nextMissionRefreshAt: nextMissionRefreshAt ?? this.nextMissionRefreshAt, 
     );
   }
 

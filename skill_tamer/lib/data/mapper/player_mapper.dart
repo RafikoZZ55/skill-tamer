@@ -1,5 +1,5 @@
 
-import 'package:skill_tamer/data/hive/generated/session_state.dart';
+import 'package:skill_tamer/data/hive/session_state.dart';
 import 'package:skill_tamer/data/hive/mission_state.dart';
 import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/hive/reward_state.dart';
@@ -24,7 +24,7 @@ class PlayerMapper {
 
   Player fromState({required PlayerState playerState}){
     return Player(
-      currentMissionRefreshAt: playerState.currentMissionRefreshAt, 
+      nextMissionRefreshAt: playerState.nextMissionRefreshAt, 
       xpGained: playerState.xpGained, 
       skills: _fromSkillsState(skillsState: playerState.skills), 
       rewards: _fromRewardsState(rewardsState: playerState.rewards), 
@@ -40,7 +40,7 @@ class PlayerMapper {
       skills: _toSkillsState(skills: player.skills), 
       rewards: _toRewardsState(rewards: player.rewards), 
       lastRefreshAt: player.lastRefreshAt, 
-      currentMissionRefreshAt: player.currentMissionRefreshAt,
+      nextMissionRefreshAt: player.nextMissionRefreshAt,
       currentMission: player.currentMission == null ? null : _toCurrentMissionState(missionState: player.currentMission!),
       activeSession: player.activeSession == null? null: _toActiveSessionState(sessionState: player.activeSession!),
     );
