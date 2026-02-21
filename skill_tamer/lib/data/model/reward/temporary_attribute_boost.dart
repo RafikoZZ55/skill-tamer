@@ -37,7 +37,7 @@ class TemporaryAttributeBoost extends TemporaryReward {
       attributesBoostAmount: attributesBoostAmount ?? Map.from(this.attributesBoostAmount),
       isActive: isActive ?? this.isActive,
       activationTime: activationTime ?? this.activationTime
-      );
+    );
   }
 
 }

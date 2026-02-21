@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:skill_tamer/components/home_app_bar.dart';
 import 'package:skill_tamer/views/mission_view.dart';
 import 'package:skill_tamer/views/session_timer_view.dart';
-import 'package:skill_tamer/views/skill_deck_view.dart';
+import 'package:skill_tamer/views/backpack_view.dart';
 
 
 class HomePage extends StatelessWidget {
 const HomePage({ super.key });
 
   static final List<Widget> views = [
-    SkillDeckView(),
+    BackpackView(),
     MissionView(),
     SessionTimerView(),
   ];
 
   static final List<Tab> tabs = [
     Tab(
-      text: "Skills",
+      text: "Backpack",
     ),
     Tab(
       text: "Mission",
