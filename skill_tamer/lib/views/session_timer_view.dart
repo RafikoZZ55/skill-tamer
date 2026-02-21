@@ -12,8 +12,44 @@ class SessionTimerView extends ConsumerStatefulWidget {
 class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      
+    ColorScheme scheme = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 30,
+        children: [
+          Stack(
+            alignment: AlignmentGeometry.center,
+            children: [
+              Text("00:00",
+              style: TextStyle(
+                fontSize: 50,
+              ),
+              ),
+
+              SizedBox(
+                width: 300,
+                height: 300,
+                child: CircularProgressIndicator(
+                  value: 0.95,
+                  backgroundColor: scheme.onPrimary,
+                  color: scheme.primary,
+                  strokeWidth: 20,
+                ),
+              )
+            ],
+          ),
+
+          SizedBox(
+            width: 150,
+            child: FilledButton(
+              onPressed: () {},
+              child: Text("Start")
+            ),
+          )
+        ],
+      ),
     );
   }
 }

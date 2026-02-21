@@ -3,7 +3,7 @@ import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 enum SkillType {
   programming(
     name: "Programming",
-    description: "Design and build software systems.",
+    description: "Forge logic into living systems and bend machines to your will. Programming is the craft of transforming abstract thought into structured code that powers applications, games, tools, and entire digital worlds. It sharpens analytical thinking, patience, and problem-solving while rewarding creativity hidden beneath strict logic.",
     icon: "🖥️",
     recommendedSessionDuration: Duration(hours: 2),
     xpMultiplier: 0.15,
@@ -18,7 +18,7 @@ enum SkillType {
 
   painting(
     name: "Painting",
-    description: "Express ideas visually through art.",
+    description: "Channel imagination into color and form. Painting allows you to translate emotion, memory, and vision onto a tangible surface. It cultivates perception, creative instinct, and aesthetic awareness while training the hand to obey the mind’s artistic impulse.",
     icon: "🖌️",
     recommendedSessionDuration: Duration(hours: 1, minutes: 30),
     xpMultiplier: 0.10,
@@ -33,7 +33,7 @@ enum SkillType {
 
   writing(
     name: "Writing",
-    description: "Communicate thoughts through structured text.",
+    description: "Shape ideas into stories, arguments, and worlds through the power of language. Writing strengthens clarity of thought, narrative structure, and expressive depth. It is both a technical discipline and a creative art that turns imagination into influence.",
     icon: "✒️",
     recommendedSessionDuration: Duration(hours: 1),
     xpMultiplier: 0.12,
@@ -48,7 +48,7 @@ enum SkillType {
 
   reading(
     name: "Reading",
-    description: "Absorb and analyze written knowledge.",
+    description: "Absorb knowledge, explore distant realities, and refine critical thinking through focused reading. This skill expands vocabulary, comprehension, and analytical ability while exposing you to new perspectives, philosophies, and systems of thought.",
     icon: "📖",
     recommendedSessionDuration: Duration(hours: 1, minutes: 30),
     xpMultiplier: 0.08,
@@ -63,7 +63,7 @@ enum SkillType {
 
   dancing(
     name: "Dancing",
-    description: "Express rhythm through coordinated movement.",
+    description: "Synchronize body and rhythm to transform movement into expression. Dancing enhances coordination, balance, and stamina while strengthening social presence and emotional confidence. It is physical storytelling driven by music and discipline.",
     icon: "💃🏼",
     recommendedSessionDuration: Duration(minutes: 45),
     xpMultiplier: 0.14,
@@ -78,7 +78,7 @@ enum SkillType {
 
   robotics(
     name: "Robotics",
-    description: "Build and program mechanical systems.",
+    description: "Combine engineering, mechanics, and programming to bring machines to life. Robotics demands structured thinking, technical precision, and iterative experimentation. It merges abstract logic with tangible construction, creating systems that interact with the physical world.",
     icon: "🤖",
     recommendedSessionDuration: Duration(hours: 2),
     xpMultiplier: 0.18,
@@ -93,7 +93,7 @@ enum SkillType {
 
   woodworking(
     name: "Woodworking",
-    description: "Craft functional or artistic wooden structures.",
+    description: "Transform raw material into functional craftsmanship. Woodworking develops spatial reasoning, patience, and practical technique while strengthening precision and hands-on problem solving. It balances artistic creativity with structural engineering.",
     icon: "🪓",
     recommendedSessionDuration: Duration(hours: 2, minutes: 30),
     xpMultiplier: 0.13,
@@ -108,7 +108,7 @@ enum SkillType {
 
   archery(
     name: "Archery",
-    description: "Develop precision and physical control.",
+    description: "Master focus, control, and precision through disciplined practice. Archery refines concentration, posture, and steady execution. Each shot demands mental clarity and physical alignment, making it a practice of both body and mind.",
     icon: "🏹",
     recommendedSessionDuration: Duration(hours: 1),
     xpMultiplier: 0.16,

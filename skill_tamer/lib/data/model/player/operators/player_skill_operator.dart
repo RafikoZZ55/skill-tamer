@@ -9,8 +9,7 @@ extension PlayerSkillOperator on Player {
     Map<SkillAttributeType,int> newAttributes = Map.from(newSkill.attributes);
 
 
-    if(newSkill.unspentAttributePoints <= 0 ) return newPlayer;
-    if(newSkill.attributes[attribute]! >= 10) return newPlayer;
+    if((newSkill.unspentAttributePoints > 0)  || (newSkill.attributes[attribute]! < 10)) return newPlayer;
 
     newAttributes[attribute] = ((newAttributes[attribute] ?? 0) + 1).clamp(0, 10);
 

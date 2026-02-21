@@ -19,13 +19,13 @@ class _SkillDeckViewState extends ConsumerState<SkillDeckView> {
     
     return Column(
       children: [
-        Text("skills"),
-        Divider(),
-
         Expanded(
-          child: GridView.count(
-            crossAxisCount: 2,
-            children: List.generate(skills.length, (index) => SkillCard(skillIndex: index)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 3),
+            child: GridView.count(
+              crossAxisCount: 2,
+              children: List.generate(skills.length, (index) => SkillCard(skillIndex: index)),
+            ),
           ),
         ),
 

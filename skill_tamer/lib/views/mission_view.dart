@@ -20,7 +20,7 @@ class _MissionViewState extends ConsumerState<MissionView> {
   void initState() {
     super.initState();
 
-    Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       final nextMissionRefreshAt =
           ref.read(playerProvider).nextMissionRefreshAt;
