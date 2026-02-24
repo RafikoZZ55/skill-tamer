@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/mapper/player_mapper.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
+import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/player/player.dart';
 
 
@@ -75,6 +76,16 @@ class PlayerController extends StateNotifier<Player> {
 
   void upgradeSkill({required int skillIndex, required SkillAttributeType attribute}){
     _setState(player: state.upgradeSkill(skillIndex: skillIndex, attribute: attribute));
+    _save();
+  }
+
+  void createNewSession({required SkillType skillType}){
+    _setState(player: state.createNewSession(skillType: skillType));
+    _save();
+  }
+
+  void stopSession(){
+    _setState(player: state.stopSession());
     _save();
   }
 

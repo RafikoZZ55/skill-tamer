@@ -25,12 +25,13 @@ class Session {
   }
 
 
-  bool isFinnished(){
-    return (DateTime.now().millisecondsSinceEpoch - timeStarted >= sessionSkill.recommendedSessionDuration.inMilliseconds) && lastSessionCheck <= DateTime.now().millisecondsSinceEpoch - const Duration(minutes: 15).inMilliseconds;
+  bool isFinished() {
+    return DateTime.now().millisecondsSinceEpoch - timeStarted
+        >= sessionSkill.recommendedSessionDuration.inMilliseconds;
   }
 
-bool isAbandoned() {
-  return DateTime.now().millisecondsSinceEpoch - lastSessionCheck > const Duration(minutes: 15).inMilliseconds;
-}
+  bool isAbandoned() {
+    return DateTime.now().millisecondsSinceEpoch - lastSessionCheck > const Duration(minutes: 15).inMilliseconds;
+  }
 
 }

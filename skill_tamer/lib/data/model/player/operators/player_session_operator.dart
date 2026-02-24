@@ -46,7 +46,7 @@ extension PlayerSessionOperator on Player {
     Session? session = activeSession;
     int reward;
 
-    if(session!.isFinnished()) {reward = _calculateFullRewards(session: session);}
+    if(session!.isFinished()) {reward = _calculateFullRewards(session: session);}
     else if (session.isAbandoned()){reward = _calculateBeggerRewards(session: session);}
     else {reward = _calculatePartialReward(session: session);}
 
