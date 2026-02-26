@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
 
-
 class RewardCard extends ConsumerStatefulWidget {
-  const RewardCard({ super.key, required this.rewardIndex });
+  const RewardCard({super.key, required this.rewardIndex});
   final int rewardIndex;
 
   @override
@@ -13,13 +12,12 @@ class RewardCard extends ConsumerStatefulWidget {
 }
 
 class _RewardCardState extends ConsumerState<RewardCard> {
-
   @override
   Widget build(BuildContext context) {
-    final Reward _reward = ref.watch(playerProvider.select((p) => p.rewards[widget.rewardIndex]));
-
-    return Card(
-      child: Text(_reward.type.name),
+    final Reward reward = ref.watch(
+      playerProvider.select((p) => p.rewards[widget.rewardIndex]),
     );
+
+    return Card(child: Text(reward.type.name));
   }
 }

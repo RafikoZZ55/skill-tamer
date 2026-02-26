@@ -7,8 +7,15 @@ import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/mapper/player_mapper.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
+import 'dart:math';
+import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/player/player.dart';
 
+class MissionOutcome {
+  final bool success;
+  final Reward? reward;
+  MissionOutcome(this.success, {this.reward});
+}
 
 class PlayerController extends StateNotifier<Player> {
   PlayerController(): super(Player.empty());
@@ -92,6 +99,48 @@ class PlayerController extends StateNotifier<Player> {
   void updateSessionCheck(){
     _setState(player: state.updateSessionCheck());
     _save();
+  }
+
+  void addReward({required Reward reward}){
+    Player newPlayer = state.copyWith();
+    List<Reward> newRewards = List.from(newPlayer.rewards);
+    newRewards.add(reward);
+    _setState(player: newPlayer.copyWith(rewards: newRewards));
+    _save();
+  }
+
+
+  void completeMissionResult({required bool success, Reward? reward}){
+    Player newPlayer = state.copyWith();
+
+    if (reward != null) {
+      List<Reward> newRewards = List.from(newPlayer.rewards);
+      newRewards.add(reward);
+      newPlayer = newPlayer.copyWith(rewards: newRewards);
+    }
+
+    final nextRefresh = DateTime.now().millisecondsSinceEpoch + Duration(hours: 1).inMilliseconds;
+    newPlayer = newPlayer.copyWith(currentMission: null, nextMissionRefreshAt: nextRefresh);
+
+    _setState(player: newPlayer);
+    _save();
+  }
+
+  MissionOutcome attemptMission({required SkillType a, required SkillType b}){
+    final mission = state.currentMission;
+    if (mission == null) {
+      return MissionOutcome(false);
+    }
+
+    final prob = state.computeMissionProbability(mission, a, b);
+    final success = Random().nextDouble() < prob;
+    Reward? reward;
+    if (success) {
+      reward = state.generateMissionReward(mission);
+    }
+
+    completeMissionResult(success: success, reward: reward);
+    return MissionOutcome(success, reward: reward);
   }
 
   

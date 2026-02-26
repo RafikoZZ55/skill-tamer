@@ -280,6 +280,28 @@ class _SessionTimerViewState
                           ),
                   ),
                 ),
+
+                const SizedBox(height: 12),
+
+                session != null ?
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () => controller.updateSessionCheck(), 
+                        child: Text("Check Session")
+                      ),
+                    ),
+                    Text("  next check at : ${
+                    _format(Duration(milliseconds: (session.lastSessionCheck + Duration(minutes: 15).inMilliseconds) - DateTime.now().millisecondsSinceEpoch))
+                  }")
+                  ],
+                )
+                : SizedBox(),
+
+
               ],
             ),
           ),

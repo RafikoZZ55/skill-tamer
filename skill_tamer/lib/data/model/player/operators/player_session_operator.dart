@@ -41,6 +41,13 @@ extension PlayerSessionOperator on Player {
     return (baseXp + baseXp * multiplyer).toInt();
   }
 
+  int _calculateAddedPoints({required int reward, required SkillType skillType}){
+    Skill skill = skills.singleWhere((s) => s.type == skillType).copyWith();
+    int currentLevel = skill.getLevel();
+    skill.xpGained += reward;
+    return skill.getLevel() - currentLevel;
+  } 
+
   Player stopSession({bool manual = false}){
     if(activeSession == null) return copyWith();
     Session? session = activeSession;
@@ -52,6 +59,7 @@ extension PlayerSessionOperator on Player {
 
     Skill selectedSkill = skills.singleWhere((s) => s.type == session.sessionSkill).copyWith();
     selectedSkill.xpGained += reward;
+    selectedSkill.unspentAttributePoints += _calculateAddedPoints(reward: reward, skillType: selectedSkill.type);
     List<Skill> newSkills = List.from(skills);
     newSkills.removeWhere((s) => s.type == session.sessionSkill);
     newSkills.add(selectedSkill);
