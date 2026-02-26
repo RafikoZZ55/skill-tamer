@@ -16,39 +16,82 @@ class SessionTimerView extends ConsumerStatefulWidget {
 class _SessionTimerViewState
     extends ConsumerState<SessionTimerView> {
   SkillType? skillType;
+  bool _hadSession = false;
   Timer? _timer;
 
   Duration _remaining = Duration.zero;
   Duration _total = Duration.zero;
 
+  bool _showingAbandonDialog = false;
+  DateTime? _abandonPopupStart;
+  final ValueNotifier<Duration> _popupRemainingNotifier =
+      ValueNotifier(Duration.zero);
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    _popupRemainingNotifier.dispose();
     super.dispose();
   }
 
-  void _startTimer(Session session) {
+  void _startTimer() {
     _timer?.cancel();
 
-    _total = session.sessionSkill.recommendedSessionDuration;
-
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final now = DateTime.now().millisecondsSinceEpoch;
-      final elapsed = now - session.timeStarted;
+      final Session? session = ref.read(playerProvider).activeSession;
 
-      final remainingMs =
-          _total.inMilliseconds - elapsed;
+      if (session == null) {
+        if (_remaining != Duration.zero || _total != Duration.zero) {
+          setState(() {
+            _remaining = Duration.zero;
+            _total = Duration.zero;
+          });
+        }
 
-      if (remainingMs <= 0) {
-        setState(() {
-          _remaining = Duration.zero;
-        });
-      } else {
-        setState(() {
-          _remaining =
-              Duration(milliseconds: remainingMs);
-        });
+        if (_showingAbandonDialog) {
+          if (mounted) {Navigator.of(context, rootNavigator: true).maybePop();}
+          
+          setState(() {
+            _showingAbandonDialog = false;
+            _abandonPopupStart = null;
+          });
+        }
+        return;
       }
+
+      if (_total != session.sessionSkill.recommendedSessionDuration) {
+        _total = session.sessionSkill.recommendedSessionDuration;
+      }
+
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final elapsed = nowMs - session.timeStarted;
+      final remainingMs = _total.inMilliseconds - elapsed;
+      final newRemaining = remainingMs <= 0 ? Duration.zero : Duration(milliseconds: remainingMs);
+
+      final now = DateTime.now();
+      if (!_showingAbandonDialog && nowMs - session.lastSessionCheck > const Duration(minutes: 15).inMilliseconds) {
+
+        _abandonPopupStart = now;
+        _popupRemainingNotifier.value = const Duration(minutes: 5);
+        _showAbandonDialog();
+      } else if (_showingAbandonDialog && _abandonPopupStart != null) {
+        final elapsedPopup = now.difference(_abandonPopupStart!);
+        final remainingPopup = const Duration(minutes: 5) - elapsedPopup;
+        if (remainingPopup <= Duration.zero) {
+          _popupRemainingNotifier.value = Duration.zero;
+          _endAbandonSession();
+        } else {
+          _popupRemainingNotifier.value = remainingPopup;
+        }
+      }
+
+      setState(() {_remaining = newRemaining;});
     });
   }
 
@@ -60,36 +103,94 @@ class _SessionTimerViewState
     return "$minutes:$seconds";
   }
 
+  void _showAbandonDialog() {
+    _showingAbandonDialog = true;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Still there?'),
+        content: ValueListenableBuilder<Duration>(
+          valueListenable: _popupRemainingNotifier,
+          builder: (context, value, _) {
+            return Text(
+              'To keep users from spaming sessions while they sleep you need to interact with the app every 15 minutes your time windfow is 5 minutes'
+              'Tap "Continue" within ${_format(value)} to keep going, '
+              'if you wont do it you will get smaller rewards'
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (mounted) {
+                ref.read(playerProvider.notifier).updateSessionCheck();
+                setState(() {
+                  _showingAbandonDialog = false;
+                  _abandonPopupStart = null;
+                });
+              }
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    ).then((_) {
+      if (mounted) {
+        setState(() {
+          _showingAbandonDialog = false;
+          _abandonPopupStart = null;
+        });
+      }
+    });
+  }
+
+  void _endAbandonSession() {
+    ref.read(playerProvider.notifier).stopSession(manual: false);
+    if (_showingAbandonDialog && mounted) {
+      Navigator.of(context, rootNavigator: true).maybePop();
+    }
+    setState(() {
+      _showingAbandonDialog = false;
+      _abandonPopupStart = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final controller =
-        ref.read(playerProvider.notifier);
+    final controller = ref.read(playerProvider.notifier);
 
-    final Session? session =
-        ref.watch(playerProvider.select((p) => p.activeSession));
-
-    if (session != null && _timer == null) {
-      _startTimer(session);
+    final Session? session = ref.watch(playerProvider.select((p) => p.activeSession));
+    if (session != null && skillType == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {skillType = session.sessionSkill;});
+      });
     }
 
-    if (session == null) {
-      _timer?.cancel();
-      _timer = null;
-      _remaining = Duration.zero;
-      _total = Duration.zero;
+    if (_hadSession && session == null && skillType != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => skillType = null ));
     }
+    _hadSession = session != null;
 
-    final progress = (_total.inSeconds == 0)
-        ? 0.0
-        : 1 - (_remaining.inSeconds / _total.inSeconds);
+    final progress = (_total.inSeconds == 0) ? 0.0 : 1 - (_remaining.inSeconds / _total.inSeconds);
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-
-          /// TIMER
+          if (session != null) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Text(
+                '${session.sessionSkill.icon} ${session.sessionSkill.name}',
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
           Stack(
             alignment: Alignment.center,
             children: [
@@ -121,19 +222,17 @@ class _SessionTimerViewState
                 const EdgeInsets.symmetric(horizontal: 35),
             child: Column(
               children: [
-
-                /// START / STOP
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: skillType == null
+                    onPressed: (session == null && skillType == null)
                         ? null
                         : () {
                             if (session == null) {
                               controller.createNewSession(
                                   skillType: skillType!);
                             } else {
-                              controller.stopSession();
+                              controller.stopSession(manual: true);
                             }
                           },
                     child:
@@ -143,7 +242,6 @@ class _SessionTimerViewState
 
                 const SizedBox(height: 12),
 
-                /// SELECT SKILL
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
@@ -204,27 +302,31 @@ class _SkillSelectionSheet extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+            const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "Select Skill",
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.start,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
+          const Divider(),
+          const SizedBox(height: 5),
           Expanded(
             child: GridView.builder(
               itemCount: SkillType.values.length,
               gridDelegate:
                   const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+                crossAxisCount: 1,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                childAspectRatio: 1.1,
+                childAspectRatio: 4.5,
               ),
               itemBuilder: (context, index) {
                 final skill = SkillType.values[index];
@@ -243,23 +345,18 @@ class _SkillSelectionSheet extends StatelessWidget {
                     ),
                     padding:
                         const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                       children: [
                         Text(
-                          skill.icon,
-                          style: const TextStyle(
-                              fontSize: 36),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
                           skill.name,
-                          textAlign:
-                              TextAlign.center,
-                          style: const TextStyle(
-                              fontWeight:
-                                  FontWeight.bold),
+                          textAlign:TextAlign.center,
+                          style: const TextStyle(fontWeight:FontWeight.bold, fontSize: 24),
+                        ),
+                        Text(
+                          skill.icon,
+                          style: const TextStyle(fontSize: 36),
                         ),
                       ],
                     ),

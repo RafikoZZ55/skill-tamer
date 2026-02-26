@@ -8,7 +8,7 @@ extension PlayerSessionOperator on Player {
       sessionSkill: skillType
       );
     
-    return copyWith(activeSession: newSession);
+    return copyWith(activeSession: newSession, activeSessionSet: true);
   }
 
   double _getActiveSessionBoostMultiplyer(){
@@ -41,13 +41,13 @@ extension PlayerSessionOperator on Player {
     return (baseXp + baseXp * multiplyer).toInt();
   }
 
-  Player stopSession(){
+  Player stopSession({bool manual = false}){
     if(activeSession == null) return copyWith();
     Session? session = activeSession;
     int reward;
 
     if(session!.isFinished()) {reward = _calculateFullRewards(session: session);}
-    else if (session.isAbandoned()){reward = _calculateBeggerRewards(session: session);}
+    else if (!manual && session.isAbandoned()) {reward = _calculateBeggerRewards(session: session);}
     else {reward = _calculatePartialReward(session: session);}
 
     Skill selectedSkill = skills.singleWhere((s) => s.type == session.sessionSkill).copyWith();
@@ -56,7 +56,7 @@ extension PlayerSessionOperator on Player {
     newSkills.removeWhere((s) => s.type == session.sessionSkill);
     newSkills.add(selectedSkill);
 
-    return copyWith(skills: newSkills, activeSession: null);
+    return copyWith(skills: newSkills, activeSession: null, activeSessionSet: true);
   }
 
 
@@ -67,6 +67,13 @@ extension PlayerSessionOperator on Player {
     updatedPlayer = _generateSession(skillType: skillType);
     
     return updatedPlayer;
+  }
+
+  Player updateSessionCheck() {
+    if (activeSession == null) return copyWith();
+    final updated = activeSession!.copyWith(
+        lastSessionCheck: DateTime.now().millisecondsSinceEpoch);
+    return copyWith(activeSession: updated, activeSessionSet: true);
   }
 
 }

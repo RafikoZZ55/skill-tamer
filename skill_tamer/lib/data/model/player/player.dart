@@ -45,6 +45,7 @@ class Player {
 
   Player copyWith({
     Session? activeSession,
+    bool activeSessionSet = false,
     List<Skill>? skills,
     List<Reward>? rewards,
     int? lastRefreshAt,
@@ -53,7 +54,7 @@ class Player {
     int? nextMissionRefreshAt
   }) {
     return Player(
-      activeSession: activeSession ?? this.activeSession,
+      activeSession: activeSessionSet ? activeSession : this.activeSession,
       xpGained: xpGained ?? this.xpGained,
       currentMission: currentMission ?? this.currentMission,
       skills: skills ?? List.from(this.skills),

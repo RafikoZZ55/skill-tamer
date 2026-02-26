@@ -16,10 +16,10 @@ class _RewardCardState extends ConsumerState<RewardCard> {
 
   @override
   Widget build(BuildContext context) {
-    Reward reward = ref.watch(playerProvider.select((p) => p.rewards[widget.rewardIndex]));
+    final Reward _reward = ref.watch(playerProvider.select((p) => p.rewards[widget.rewardIndex]));
 
     return Card(
-
+      child: Text(_reward.type.name),
     );
   }
 }

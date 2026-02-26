@@ -84,8 +84,13 @@ class PlayerController extends StateNotifier<Player> {
     _save();
   }
 
-  void stopSession(){
-    _setState(player: state.stopSession());
+  void stopSession({bool manual = false}){
+    _setState(player: state.stopSession(manual: manual));
+    _save();
+  }
+
+  void updateSessionCheck(){
+    _setState(player: state.updateSessionCheck());
     _save();
   }
 

@@ -53,8 +53,7 @@ class _MissionViewState extends ConsumerState<MissionView> {
   
   @override
   Widget build(BuildContext context) {
-
-    Mission? mission = ref.watch(playerProvider.select((p) => p.currentMission));
+    final Mission? _mission = ref.watch(playerProvider.select((p) => p.currentMission));
 
     return Column(
       children: [
