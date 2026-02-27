@@ -84,7 +84,17 @@ extension PlayerMissionOperator on Player {
     final avg = (count == 0) ? 0.0 : (totalRatio / count);
     return (avg / 2).clamp(0.0, 0.95);
   }
-  
+
+  /// Calculate XP reward based on mission difficulty (attribute sum).
+  int calculateMissionXpReward(Mission mission) {
+    int totalReq = mission.attributeCheck.values.fold(0, (sum, val) => sum + val);
+    int baseXp = 500 + (totalReq * 50);
+    // Bonus for higher player level
+    int levelBonus = getLevel() * 10;
+    return baseXp + levelBonus;
+  }
+
+  /// Generate reward for successful mission (temporary attribute boost).
   Reward generateMissionReward(Mission mission) {
     SkillAttributeType bestAttr = mission.attributeCheck.entries
         .reduce((a, b) => a.value >= b.value ? a : b)

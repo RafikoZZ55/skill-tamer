@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
@@ -18,40 +17,37 @@ class MissionOutcome {
 }
 
 class PlayerController extends StateNotifier<Player> {
-  PlayerController(): super(Player.empty());
+  PlayerController() : super(Player.empty());
 
   Timer? _timer;
   final PlayerMapper _playerMapper = PlayerMapper();
   late final Box<PlayerState> _playerBox;
 
-
-  Future<void> init() async{
+  Future<void> init() async {
     _playerBox = Hive.box<PlayerState>("player");
     _loadFromHive();
     _startTimer();
   }
 
-  void _startTimer(){
+  void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
   }
 
   void _loadFromHive() {
     Player player;
 
-    if(_playerBox.isEmpty || _playerBox.getAt(0) == null) {
+    if (_playerBox.isEmpty || _playerBox.getAt(0) == null) {
       Player newPlayer = Player.empty();
       newPlayer = newPlayer.refreshMission();
       newPlayer = newPlayer.refreshSkills();
       player = newPlayer.copyWith();
-    }
-    else {
+    } else {
       PlayerState? playerState = _playerBox.getAt(0);
       player = _playerMapper.fromState(playerState: playerState!);
     }
 
     state = player.copyWith();
   }
-
 
   @override
   void dispose() {
@@ -60,48 +56,57 @@ class PlayerController extends StateNotifier<Player> {
     _save();
   }
 
-
-
-  void _save(){
+  void _save() {
     PlayerState playerState = _playerMapper.toState(player: state);
-    if(_playerBox.isEmpty) {_playerBox.add(playerState);}
-    else {_playerBox.putAt(0, playerState);}
+    if (_playerBox.isEmpty) {
+      _playerBox.add(playerState);
+    } else {
+      _playerBox.putAt(0, playerState);
+    }
   }
 
-  void _setState({required Player player}){
+  void _setState({required Player player}) {
     state = player.copyWith();
     _save();
   }
 
+  void _onTick() {
+    if (state.isMissionExpierd()) _setState(player: state.refreshMission());
+    if (state.areSkillsEmpty()) _setState(player: state.refreshSkills());
 
-  void _onTick(){
-    if(state.isMissionExpierd()) _setState(player: state.refreshMission());
-    if(state.areSkillsEmpty()) _setState(player: state.refreshSkills());
-
-    _setState(player: state.copyWith(lastRefreshAt: DateTime.now().millisecondsSinceEpoch));
+    _setState(
+      player: state.copyWith(
+        lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
   }
 
-  void upgradeSkill({required int skillIndex, required SkillAttributeType attribute}){
-    _setState(player: state.upgradeSkill(skillIndex: skillIndex, attribute: attribute));
+  void upgradeSkill({
+    required int skillIndex,
+    required SkillAttributeType attribute,
+  }) {
+    _setState(
+      player: state.upgradeSkill(skillIndex: skillIndex, attribute: attribute),
+    );
     _save();
   }
 
-  void createNewSession({required SkillType skillType}){
+  void createNewSession({required SkillType skillType}) {
     _setState(player: state.createNewSession(skillType: skillType));
     _save();
   }
 
-  void stopSession({bool manual = false}){
+  void stopSession({bool manual = false}) {
     _setState(player: state.stopSession(manual: manual));
     _save();
   }
 
-  void updateSessionCheck(){
+  void updateSessionCheck() {
     _setState(player: state.updateSessionCheck());
     _save();
   }
 
-  void addReward({required Reward reward}){
+  void addReward({required Reward reward}) {
     Player newPlayer = state.copyWith();
     List<Reward> newRewards = List.from(newPlayer.rewards);
     newRewards.add(reward);
@@ -109,8 +114,12 @@ class PlayerController extends StateNotifier<Player> {
     _save();
   }
 
+  void useReward({required int rewardIndex, int? skillIndex}) {
+    _setState(player: state.useReward(rewardIndex: rewardIndex, skillIndex: skillIndex));
+    _save();
+  }
 
-  void completeMissionResult({required bool success, Reward? reward}){
+  void completeMissionResult({required bool success, Reward? reward}) {
     Player newPlayer = state.copyWith();
 
     if (reward != null) {
@@ -119,14 +128,27 @@ class PlayerController extends StateNotifier<Player> {
       newPlayer = newPlayer.copyWith(rewards: newRewards);
     }
 
-    final nextRefresh = DateTime.now().millisecondsSinceEpoch + Duration(hours: 1).inMilliseconds;
-    newPlayer = newPlayer.copyWith(currentMission: null, nextMissionRefreshAt: nextRefresh);
+    // Award XP for successful mission
+    int xpReward = 0;
+    if (success && newPlayer.currentMission != null) {
+      xpReward = newPlayer.calculateMissionXpReward(newPlayer.currentMission!);
+      newPlayer = newPlayer.copyWith(xpGained: newPlayer.xpGained + xpReward);
+    }
+
+    // Lock mission until timer expires (next refresh in 1 hour)
+    final nextRefresh =
+        DateTime.now().millisecondsSinceEpoch +
+        Duration(hours: 1).inMilliseconds;
+    newPlayer = newPlayer.copyWith(
+      currentMission: null,
+      nextMissionRefreshAt: nextRefresh,
+    );
 
     _setState(player: newPlayer);
     _save();
   }
 
-  MissionOutcome attemptMission({required SkillType a, required SkillType b}){
+  MissionOutcome attemptMission({required SkillType a, required SkillType b}) {
     final mission = state.currentMission;
     if (mission == null) {
       return MissionOutcome(false);
@@ -142,7 +164,4 @@ class PlayerController extends StateNotifier<Player> {
     completeMissionResult(success: success, reward: reward);
     return MissionOutcome(success, reward: reward);
   }
-
-  
-  
 }

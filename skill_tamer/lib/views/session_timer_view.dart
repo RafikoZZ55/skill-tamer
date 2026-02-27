@@ -4,17 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/session/session.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
+import 'package:skill_tamer/data/model/reward/session_boost.dart';
+import 'package:skill_tamer/views/skill_selection_sheet.dart';
 
 class SessionTimerView extends ConsumerStatefulWidget {
   const SessionTimerView({super.key});
 
   @override
-  ConsumerState<SessionTimerView> createState() =>
-      _SessionTimerViewState();
+  ConsumerState<SessionTimerView> createState() => _SessionTimerViewState();
 }
 
-class _SessionTimerViewState
-    extends ConsumerState<SessionTimerView> {
+class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
   SkillType? skillType;
   bool _hadSession = false;
   Timer? _timer;
@@ -24,8 +24,9 @@ class _SessionTimerViewState
 
   bool _showingAbandonDialog = false;
   DateTime? _abandonPopupStart;
-  final ValueNotifier<Duration> _popupRemainingNotifier =
-      ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> _popupRemainingNotifier = ValueNotifier(
+    Duration.zero,
+  );
 
   @override
   void initState() {
@@ -55,8 +56,10 @@ class _SessionTimerViewState
         }
 
         if (_showingAbandonDialog) {
-          if (mounted) {Navigator.of(context, rootNavigator: true).maybePop();}
-          
+          if (mounted) {
+            Navigator.of(context, rootNavigator: true).maybePop();
+          }
+
           setState(() {
             _showingAbandonDialog = false;
             _abandonPopupStart = null;
@@ -72,11 +75,14 @@ class _SessionTimerViewState
       final nowMs = DateTime.now().millisecondsSinceEpoch;
       final elapsed = nowMs - session.timeStarted;
       final remainingMs = _total.inMilliseconds - elapsed;
-      final newRemaining = remainingMs <= 0 ? Duration.zero : Duration(milliseconds: remainingMs);
+      final newRemaining = remainingMs <= 0
+          ? Duration.zero
+          : Duration(milliseconds: remainingMs);
 
       final now = DateTime.now();
-      if (!_showingAbandonDialog && nowMs - session.lastSessionCheck > const Duration(minutes: 15).inMilliseconds) {
-
+      if (!_showingAbandonDialog &&
+          nowMs - session.lastSessionCheck >
+              const Duration(minutes: 15).inMilliseconds) {
         _abandonPopupStart = now;
         _popupRemainingNotifier.value = const Duration(minutes: 5);
         _showAbandonDialog();
@@ -91,15 +97,15 @@ class _SessionTimerViewState
         }
       }
 
-      setState(() {_remaining = newRemaining;});
+      setState(() {
+        _remaining = newRemaining;
+      });
     });
   }
 
   String _format(Duration d) {
-    final minutes =
-        d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds =
-        d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
@@ -117,7 +123,7 @@ class _SessionTimerViewState
             return Text(
               'To keep users from spaming sessions while they sleep you need to interact with the app every 15 minutes your time windfow is 5 minutes'
               'Tap "Continue" within ${_format(value)} to keep going, '
-              'if you wont do it you will get smaller rewards'
+              'if you wont do it you will get smaller rewards',
             );
           },
         ),
@@ -163,19 +169,27 @@ class _SessionTimerViewState
     final scheme = Theme.of(context).colorScheme;
     final controller = ref.read(playerProvider.notifier);
 
-    final Session? session = ref.watch(playerProvider.select((p) => p.activeSession));
+    final Session? session = ref.watch(
+      playerProvider.select((p) => p.activeSession),
+    );
     if (session != null && skillType == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {skillType = session.sessionSkill;});
+        setState(() {
+          skillType = session.sessionSkill;
+        });
       });
     }
 
     if (_hadSession && session == null && skillType != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => skillType = null ));
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => setState(() => skillType = null),
+      );
     }
     _hadSession = session != null;
 
-    final progress = (_total.inSeconds == 0) ? 0.0 : 1 - (_remaining.inSeconds / _total.inSeconds);
+    final progress = (_total.inSeconds == 0)
+        ? 0.0
+        : 1 - (_remaining.inSeconds / _total.inSeconds);
 
     return Center(
       child: Column(
@@ -187,7 +201,9 @@ class _SessionTimerViewState
               child: Text(
                 '${session.sessionSkill.icon} ${session.sessionSkill.name}',
                 style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w500),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -208,8 +224,7 @@ class _SessionTimerViewState
                   value: progress.clamp(0, 1),
                   strokeWidth: 18,
                   color: scheme.primary,
-                  backgroundColor:
-                      scheme.surfaceContainerHighest,
+                  backgroundColor: scheme.surfaceContainerHighest,
                 ),
               ),
             ],
@@ -218,8 +233,7 @@ class _SessionTimerViewState
           const SizedBox(height: 40),
 
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 35),
+            padding: const EdgeInsets.symmetric(horizontal: 35),
             child: Column(
               children: [
                 SizedBox(
@@ -230,13 +244,13 @@ class _SessionTimerViewState
                         : () {
                             if (session == null) {
                               controller.createNewSession(
-                                  skillType: skillType!);
+                                skillType: skillType!,
+                              );
                             } else {
                               controller.stopSession(manual: true);
                             }
                           },
-                    child:
-                        Text(session == null ? "Start" : "Stop"),
+                    child: Text(session == null ? "Start" : "Stop"),
                   ),
                 ),
 
@@ -249,13 +263,11 @@ class _SessionTimerViewState
                         ? null
                         : () async {
                             final selected =
-                                await showModalBottomSheet<
-                                    SkillType>(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (_) =>
-                                  const _SkillSelectionSheet(),
-                            );
+                                await showModalBottomSheet<SkillType>(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (_) => const SkillSelectionSheet(),
+                                );
 
                             if (selected != null) {
                               setState(() {
@@ -266,13 +278,11 @@ class _SessionTimerViewState
                     child: skillType == null
                         ? const Text("Select Skill")
                         : Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 skillType!.icon,
-                                style: const TextStyle(
-                                    fontSize: 20),
+                                style: const TextStyle(fontSize: 20),
                               ),
                               const SizedBox(width: 8),
                               Text(skillType!.name),
@@ -283,25 +293,29 @@ class _SessionTimerViewState
 
                 const SizedBox(height: 12),
 
-                session != null ?
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: () => controller.updateSessionCheck(), 
-                        child: Text("Check Session")
-                      ),
-                    ),
-                    Text("  next check at : ${
-                    _format(Duration(milliseconds: (session.lastSessionCheck + Duration(minutes: 15).inMilliseconds) - DateTime.now().millisecondsSinceEpoch))
-                  }")
-                  ],
-                )
-                : SizedBox(),
+                if (session != null) ...[
+                  _buildSessionMultiplierCard(ref, scheme),
+                ],
 
+                const SizedBox(height: 12),
 
+                session != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              onPressed: () => controller.updateSessionCheck(),
+                              child: const Text("Check Session"),
+                            ),
+                          ),
+                          Text(
+                            "  next check at : ${_format(Duration(milliseconds: (session.lastSessionCheck + Duration(minutes: 15).inMilliseconds) - DateTime.now().millisecondsSinceEpoch))}",
+                          ),
+                        ],
+                      )
+                    : const SizedBox(),
               ],
             ),
           ),
@@ -309,85 +323,41 @@ class _SessionTimerViewState
       ),
     );
   }
-}
 
-class _SkillSelectionSheet extends StatelessWidget {
-  const _SkillSelectionSheet();
+  Widget _buildSessionMultiplierCard(WidgetRef ref, ColorScheme scheme) {
+    final player = ref.read(playerProvider);
+    final sessionBoosts = player.rewards
+        .whereType<SessionBoost>()
+        .where((r) => r.isActive)
+        .toList();
+    double totalMultiplier = sessionBoosts.fold(
+      0.0,
+      (sum, boost) => sum + boost.sessionBoostMultiplyer,
+    );
 
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      height: MediaQuery.of(context).size.height * 0.65,
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(12)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Select Skill",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+    return Card(
+      color: totalMultiplier > 0
+          ? scheme.secondaryContainer
+          : scheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              '📢 Session Multiplier:',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            textAlign: TextAlign.start,
-          ),
-          const SizedBox(height: 5),
-          const Divider(),
-          const SizedBox(height: 5),
-          Expanded(
-            child: GridView.builder(
-              itemCount: SkillType.values.length,
-              gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 4.5,
+            Text(
+              'x${(1.0 + totalMultiplier).toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: scheme.primary,
               ),
-              itemBuilder: (context, index) {
-                final skill = SkillType.values[index];
-
-                return InkWell(
-                  borderRadius:
-                      BorderRadius.circular(16),
-                  onTap: () =>
-                      Navigator.pop(context, skill),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color:
-                          scheme.primaryContainer,
-                      borderRadius:
-                          BorderRadius.circular(16),
-                    ),
-                    padding:
-                        const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                      children: [
-                        Text(
-                          skill.name,
-                          textAlign:TextAlign.center,
-                          style: const TextStyle(fontWeight:FontWeight.bold, fontSize: 24),
-                        ),
-                        Text(
-                          skill.icon,
-                          style: const TextStyle(fontSize: 36),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
