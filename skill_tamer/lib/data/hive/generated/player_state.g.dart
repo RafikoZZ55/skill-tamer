@@ -24,13 +24,14 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       nextMissionRefreshAt: fields[5] as int,
       currentMission: fields[4] as MissionState?,
       activeSession: fields[6] as SessionState?,
+      totalSkillBoost: (fields[7] as Map).cast<String,int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, PlayerState obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.xpGained)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       ..writeByte(5)
       ..write(obj.nextMissionRefreshAt)
       ..writeByte(6)
-      ..write(obj.activeSession);
+      ..write(obj.activeSession)
+      ..writeByte(7)
+      ..write(obj.totalSkillBoost);
   }
 
   @override

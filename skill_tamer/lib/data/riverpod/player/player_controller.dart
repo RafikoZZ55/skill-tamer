@@ -129,20 +129,19 @@ class PlayerController extends StateNotifier<Player> {
       newPlayer = newPlayer.copyWith(rewards: newRewards);
     }
 
-    // Award XP for successful mission
     int xpReward = 0;
     if (success && newPlayer.currentMission != null) {
       xpReward = newPlayer.calculateMissionXpReward(newPlayer.currentMission!);
       newPlayer = newPlayer.copyWith(xpGained: newPlayer.xpGained + xpReward);
     }
 
-    // Lock mission until timer expires (next refresh in 1 hour)
     final nextRefresh =
         DateTime.now().millisecondsSinceEpoch +
         Duration(hours: 1).inMilliseconds;
     newPlayer = newPlayer.copyWith(
       currentMission: null,
       nextMissionRefreshAt: nextRefresh,
+      totalSkillBoost: {}, // clear all temporary boosts after mission ends
     );
 
     _setState(player: newPlayer);

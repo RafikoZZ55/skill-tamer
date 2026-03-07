@@ -30,6 +30,9 @@ class PlayerState {
   @HiveField(6)
   SessionState? activeSession;
 
+  @HiveField(7)
+  Map<String,int> totalSkillBoost;
+
   PlayerState({
     required this.xpGained,
     required this.skills,
@@ -38,6 +41,7 @@ class PlayerState {
     required this.nextMissionRefreshAt,
     this.currentMission,
     this.activeSession,
-  });
+    Map<String,int>? totalSkillBoost,
+  }) : totalSkillBoost = totalSkillBoost ?? {};
 
 }

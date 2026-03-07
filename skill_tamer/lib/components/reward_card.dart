@@ -26,16 +26,25 @@ class _RewardCardState extends ConsumerState<RewardCard> {
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: reward.isActive ? scheme.primaryContainer : scheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: reward.isActive ? scheme.primary : scheme.outlineVariant,
-          width: reward.isActive ? 2 : 1,
+          width: reward.isActive ? 2.5 : 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: reward.isActive 
+              ? scheme.primary.withOpacity(0.3)
+              : Colors.black.withOpacity(0.08),
+            blurRadius: reward.isActive ? 12 : 8,
+            offset: Offset(0, reward.isActive ? 4 : 2),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           onTap: reward.isActive
               ? null
               : () async {
@@ -55,7 +64,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
                   );
                 },
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: _buildRewardContent(reward, scheme),
           ),
         ),
@@ -69,31 +78,74 @@ class _RewardCardState extends ConsumerState<RewardCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '⚡ Attribute Boost',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: scheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '⚡',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Attribute Boost',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Apply to all skills',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: scheme.onSurface.withOpacity(0.6),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
               if (reward.isActive)
                 Chip(
-                  label: const Text('Active', style: TextStyle(fontSize: 10)),
+                  label: const Text('Applied', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
                   backgroundColor: scheme.primary,
                   labelStyle: TextStyle(color: scheme.onPrimary),
+                  side: BorderSide.none,
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: 8,
+            runSpacing: 8,
             children: reward.attributesBoostAmount.entries.map((e) {
-              return Chip(
-                label: Text(
-                  '${e.key.name} +${e.value}',
-                  style: const TextStyle(fontSize: 10),
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: scheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: scheme.secondary.withOpacity(0.3),
+                  ),
                 ),
-                backgroundColor: scheme.secondaryContainer,
+                child: Text(
+                  '${e.key.name} +${e.value}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: scheme.onSecondaryContainer,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
           ),
@@ -104,24 +156,71 @@ class _RewardCardState extends ConsumerState<RewardCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '📢 Session Boost',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: scheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '📢',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Session Boost',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Apply to one skill',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: scheme.onSurface.withOpacity(0.6),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
               if (reward.isActive)
                 Chip(
-                  label: const Text('Active', style: TextStyle(fontSize: 10)),
+                  label: const Text('Active', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
                   backgroundColor: scheme.primary,
                   labelStyle: TextStyle(color: scheme.onPrimary),
+                  side: BorderSide.none,
                 ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Multiplier: x${reward.sessionBoostMultiplyer.toStringAsFixed(2)}',
-            style: TextStyle(fontSize: 12, color: scheme.onSurface),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: scheme.tertiaryContainer,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: scheme.tertiary.withOpacity(0.3),
+              ),
+            ),
+            child: Text(
+              'Multiplier: x${reward.sessionBoostMultiplyer.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: scheme.onTertiaryContainer,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       );
@@ -130,12 +229,13 @@ class _RewardCardState extends ConsumerState<RewardCard> {
     return Text(
       reward.type.name,
       style: const TextStyle(fontWeight: FontWeight.bold),
+      overflow: TextOverflow.ellipsis,
     );
   }
 
   bool _shouldShowSkillPicker(Reward reward) {
-    // Show skill picker for rewards that apply to specific skills
-    return reward is SessionBoost || reward is TemporaryAttributeBoost;
+    // Only session boosts need a specific skill target; attribute boosts are global now
+    return reward is SessionBoost;
   }
 
   Future<int?> _showSkillPickerDialog(
