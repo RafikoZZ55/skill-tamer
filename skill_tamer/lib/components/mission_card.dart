@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skill_tamer/data/model/mission/mission.dart';
 
 class MissionCard extends ConsumerStatefulWidget {
-  const MissionCard({ required this.mission });
+  const MissionCard({super.key, required this.mission});
   final Mission mission;
 
   @override
