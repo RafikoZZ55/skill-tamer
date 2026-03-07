@@ -31,6 +31,7 @@ class PlayerMapper {
       lastRefreshAt: playerState.lastRefreshAt,
       currentMission: playerState.currentMission == null ? null : _formCurrentMissionState(missionState: playerState.currentMission!),
       activeSession: playerState.activeSession == null ? null : _fromActiveSessionState(sessionState: playerState.activeSession!),
+      totalSkillBoost: _fromSkillAttributeStateMap(attributesState: playerState.totalSkillBoost),
     );
   }
 
@@ -43,7 +44,7 @@ class PlayerMapper {
       nextMissionRefreshAt: player.nextMissionRefreshAt,
       currentMission: player.currentMission == null ? null : _toCurrentMissionState(missionState: player.currentMission!),
       activeSession: player.activeSession == null? null: _toActiveSessionState(sessionState: player.activeSession!),
+      totalSkillBoost: _toSkillAttributeStateMap(attributes: player.totalSkillBoost),
     );
   }
-
 }

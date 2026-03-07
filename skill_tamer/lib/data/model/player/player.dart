@@ -22,6 +22,8 @@ class Player {
   Mission? currentMission;
   int nextMissionRefreshAt;
   Session? activeSession;
+  /// accumulated attribute boosts applied via rewards. resets on new mission.
+  Map<SkillAttributeType,int> totalSkillBoost;
 
   Player({
     required this.nextMissionRefreshAt,
@@ -30,8 +32,9 @@ class Player {
     required this.rewards,
     required this.lastRefreshAt,
     this.currentMission,
-    this.activeSession
-  });
+    this.activeSession,
+    Map<SkillAttributeType,int>? totalSkillBoost,
+  }) : totalSkillBoost = totalSkillBoost ?? {};
 
   static Player empty(){
     return Player(
@@ -40,6 +43,7 @@ class Player {
       rewards: [], 
       lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
       nextMissionRefreshAt: DateTime.now().millisecondsSinceEpoch,
+      totalSkillBoost: {},
     );
   }
 
@@ -51,7 +55,8 @@ class Player {
     int? lastRefreshAt,
     Mission? currentMission,
     int? xpGained,
-    int? nextMissionRefreshAt
+    int? nextMissionRefreshAt,
+    Map<SkillAttributeType,int>? totalSkillBoost,
   }) {
     return Player(
       activeSession: activeSessionSet ? activeSession : this.activeSession,
@@ -61,6 +66,7 @@ class Player {
       rewards: rewards ?? List.from(this.rewards),
       lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
       nextMissionRefreshAt: nextMissionRefreshAt ?? this.nextMissionRefreshAt, 
+      totalSkillBoost: totalSkillBoost ?? Map.from(this.totalSkillBoost),
     );
   }
 

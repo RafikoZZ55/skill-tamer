@@ -51,9 +51,11 @@ extension PlayerMissionOperator on Player {
     int newNextMissionRefreshAt =
         DateTime.now().millisecondsSinceEpoch +
         Duration(hours: 1).inMilliseconds;
+    // reset temporary boosts when a new mission starts
     return copyWith(
       currentMission: newMission,
       nextMissionRefreshAt: newNextMissionRefreshAt,
+      totalSkillBoost: {},
     );
   }
 
