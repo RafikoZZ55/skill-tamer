@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/legacy.dart';
+
 import 'package:hive/hive.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/mapper/player_mapper.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
