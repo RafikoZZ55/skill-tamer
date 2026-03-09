@@ -51,7 +51,6 @@ extension PlayerMissionOperator on Player {
     int newNextMissionRefreshAt =
         DateTime.now().millisecondsSinceEpoch +
         Duration(hours: 1).inMilliseconds;
-    // reset temporary boosts when a new mission starts
     return copyWith(
       currentMission: newMission,
       nextMissionRefreshAt: newNextMissionRefreshAt,
@@ -59,7 +58,7 @@ extension PlayerMissionOperator on Player {
     );
   }
 
-  double computeMissionProbability(Mission mission, SkillType a, SkillType b) {
+  double computeMissionProbability({required Mission mission, required SkillType a, required SkillType b}) {
     final skillA = skills.firstWhere(
       (s) => s.type == a,
       orElse: () => Skill(type: a),
@@ -69,6 +68,21 @@ extension PlayerMissionOperator on Player {
       orElse: () => Skill(type: b),
     );
     final boost = calculateSkillAttributeBoost();
+
+    bool allAttributesMet = true;
+    mission.attributeCheck.forEach((attr, requiredValue) {
+      final val =
+          (skillA.attributes[attr] ?? 0) +
+          (skillB.attributes[attr] ?? 0) +
+          (boost[attr] ?? 0);
+      if (val < requiredValue) {
+        allAttributesMet = false;
+      }
+    });
+
+    if (allAttributesMet) {
+      return 1.0;
+    }
 
     double totalRatio = 0.0;
     int count = 0;
@@ -87,20 +101,24 @@ extension PlayerMissionOperator on Player {
     return (avg / 2).clamp(0.0, 0.95);
   }
 
-  /// Calculate XP reward based on mission difficulty (attribute sum).
   int calculateMissionXpReward(Mission mission) {
     int totalReq = mission.attributeCheck.values.fold(0, (sum, val) => sum + val);
     int baseXp = 500 + (totalReq * 50);
-    // Bonus for higher player level
     int levelBonus = getLevel() * 10;
     return baseXp + levelBonus;
   }
 
-  /// Generate reward for successful mission (temporary attribute boost).
-  Reward generateMissionReward(Mission mission) {
-    SkillAttributeType bestAttr = mission.attributeCheck.entries
-        .reduce((a, b) => a.value >= b.value ? a : b)
-        .key;
-    return TemporaryAttributeBoost(attributesBoostAmount: {bestAttr: 2});
+  Reward generateMissionReward() {
+    RewardType rewardType = RewardType.getRandom();
+    late Reward newReward;
+    switch (rewardType) {
+      case RewardType.redistributeAttributePoints: newReward = RedistributeAttributePoints();
+      case RewardType.sessionBoost: newReward = SessionBoost(sessionBoostMultiplyer: Random().nextInt(4) / 10 + 1,);
+      case RewardType.temporaryAttributeBoost: newReward = TemporaryAttributeBoost(
+        attributesBoostAmount: {SkillAttributeType.getRandom(): 2}
+      );
+    }
+    return newReward;
+
   }
 }

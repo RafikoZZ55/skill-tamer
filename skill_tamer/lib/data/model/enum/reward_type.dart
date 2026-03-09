@@ -1,3 +1,5 @@
+import 'dart:math';
+
 enum RewardType {
   temporaryAttributeBoost(
     description: "Boost your stats for short time",
@@ -28,5 +30,9 @@ enum RewardType {
 
   static RewardType get({required String rewardName}){
     return RewardType.values.singleWhere((e) => e.name == rewardName);
+  }
+
+  static RewardType getRandom(){
+    return RewardType.values.toList()[ Random().nextInt(RewardType.values.length) ];
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:hive/hive.dart';
 import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/mapper/player_mapper.dart';
+import 'package:skill_tamer/data/model/enum/reward_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'dart:math';
@@ -133,6 +134,8 @@ class PlayerController extends StateNotifier<Player> {
       xpReward = newPlayer.calculateMissionXpReward(newPlayer.currentMission!);
       newPlayer = newPlayer.copyWith(xpGained: newPlayer.xpGained + xpReward);
     }
+    List<Reward> newRewards = List.from(state.rewards);
+    newRewards.removeWhere((r) => r.type == RewardType.temporaryAttributeBoost && r.isActive == true);
 
     final nextRefresh =
         DateTime.now().millisecondsSinceEpoch +
@@ -140,7 +143,8 @@ class PlayerController extends StateNotifier<Player> {
     newPlayer = newPlayer.copyWith(
       currentMission: null,
       nextMissionRefreshAt: nextRefresh,
-      totalSkillBoost: {}, // clear all temporary boosts after mission ends
+      totalSkillBoost: {},
+      rewards: newRewards,
     );
 
     _setState(player: newPlayer);
@@ -153,11 +157,11 @@ class PlayerController extends StateNotifier<Player> {
       return MissionOutcome(false);
     }
 
-    final prob = state.computeMissionProbability(mission, a, b);
+    final prob = state.computeMissionProbability(mission: mission, a: a, b: b);
     final success = Random().nextDouble() < prob;
     Reward? reward;
     if (success) {
-      reward = state.generateMissionReward(mission);
+      reward = state.generateMissionReward();
     }
 
     completeMissionResult(success: success, reward: reward);

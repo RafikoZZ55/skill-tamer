@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:skill_tamer/data/model/enum/mission_type.dart';
+import 'package:skill_tamer/data/model/enum/reward_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/mission/mission.dart';
+import 'package:skill_tamer/data/model/reward/redistribute_attribute_points.dart';
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
 import 'package:skill_tamer/data/model/reward/temporary_attribute_boost.dart';
@@ -22,8 +24,7 @@ class Player {
   Mission? currentMission;
   int nextMissionRefreshAt;
   Session? activeSession;
-  /// accumulated attribute boosts applied via rewards. resets on new mission.
-  Map<SkillAttributeType,int> totalSkillBoost;
+
 
   Player({
     required this.nextMissionRefreshAt,
@@ -33,8 +34,7 @@ class Player {
     required this.lastRefreshAt,
     this.currentMission,
     this.activeSession,
-    Map<SkillAttributeType,int>? totalSkillBoost,
-  }) : totalSkillBoost = totalSkillBoost ?? {};
+  });
 
   static Player empty(){
     return Player(
@@ -43,7 +43,6 @@ class Player {
       rewards: [], 
       lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
       nextMissionRefreshAt: DateTime.now().millisecondsSinceEpoch,
-      totalSkillBoost: {},
     );
   }
 
@@ -66,7 +65,6 @@ class Player {
       rewards: rewards ?? List.from(this.rewards),
       lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
       nextMissionRefreshAt: nextMissionRefreshAt ?? this.nextMissionRefreshAt, 
-      totalSkillBoost: totalSkillBoost ?? Map.from(this.totalSkillBoost),
     );
   }
 

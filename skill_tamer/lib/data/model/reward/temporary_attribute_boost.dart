@@ -20,15 +20,9 @@ class TemporaryAttributeBoost extends TemporaryReward {
 
   @override
   Player activate({required Player player, int? skillIndex}) {
-    // apply attribute amounts to the global boost map (stacking)
-    Map<SkillAttributeType,int> newBoost = Map.from(player.totalSkillBoost);
-    for (final attr in attributesBoostAmount.keys) {
-      newBoost[attr] = ((newBoost[attr] ?? 0) + attributesBoostAmount[attr]!).clamp(0, 10);
-    }
 
-    Player newPlayer = player.copyWith(totalSkillBoost: newBoost);
+    Player newPlayer = player.copyWith();
 
-    // mark reward active too for compatibility
     List<Reward> newRewards = List.from(newPlayer.rewards);
     int rewardIndex = newRewards.indexOf(this);
     if (rewardIndex != -1) {

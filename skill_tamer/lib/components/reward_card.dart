@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skill_tamer/data/model/reward/redistribute_attribute_points.dart';
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/temporary_attribute_boost.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
@@ -25,7 +26,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        color: reward.isActive ? scheme.primaryContainer : scheme.surface,
+        color: reward.isActive ? scheme.primaryContainer : scheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: reward.isActive ? scheme.primary : scheme.outlineVariant,
@@ -34,10 +35,11 @@ class _RewardCardState extends ConsumerState<RewardCard> {
         boxShadow: [
           BoxShadow(
             color: reward.isActive 
-              ? scheme.primary.withOpacity(0.3)
-              : Colors.black.withOpacity(0.08),
-            blurRadius: reward.isActive ? 12 : 8,
-            offset: Offset(0, reward.isActive ? 4 : 2),
+              ? scheme.primary.withAlpha(50)
+              : scheme.shadow.withAlpha(50),
+            blurRadius: reward.isActive ? 14 : 8,
+            offset: Offset(0, reward.isActive ? 6 : 2),
+            spreadRadius: reward.isActive ? 2 : 0,
           ),
         ],
       ),
@@ -48,7 +50,6 @@ class _RewardCardState extends ConsumerState<RewardCard> {
           onTap: reward.isActive
               ? null
               : () async {
-                  // Check if reward needs skill selection
                   int? selectedSkillIndex;
                   if (_shouldShowSkillPicker(reward)) {
                     selectedSkillIndex = await _showSkillPickerDialog(
@@ -107,7 +108,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
                       'Apply to all skills',
                       style: TextStyle(
                         fontSize: 11,
-                        color: scheme.onSurface.withOpacity(0.6),
+                        color: scheme.onSurface.withValues(alpha: 0.6),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -134,7 +135,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
                   color: scheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: scheme.secondary.withOpacity(0.3),
+                    color: scheme.secondary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
@@ -185,7 +186,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
                       'Apply to one skill',
                       style: TextStyle(
                         fontSize: 11,
-                        color: scheme.onSurface.withOpacity(0.6),
+                        color: scheme.onSurface.withValues(alpha: 0.6),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -209,7 +210,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
               color: scheme.tertiaryContainer,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: scheme.tertiary.withOpacity(0.3),
+                color: scheme.tertiary.withValues(alpha: 0.3),
               ),
             ),
             child: Text(
@@ -234,8 +235,7 @@ class _RewardCardState extends ConsumerState<RewardCard> {
   }
 
   bool _shouldShowSkillPicker(Reward reward) {
-    // Only session boosts need a specific skill target; attribute boosts are global now
-    return reward is SessionBoost;
+    return reward is RedistributeAttributePoints;
   }
 
   Future<int?> _showSkillPickerDialog(

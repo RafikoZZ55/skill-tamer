@@ -27,18 +27,33 @@ const HomePage({ super.key });
   ];
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: HomeAppBar(),
       body: DefaultTabController(
-        length: 3, 
+        length: 3,
         child: Column(
           children: [
-            Expanded(child: TabBarView( children: views )),
-            TabBar( tabs: tabs ),
+            Expanded(
+              child: TabBarView(children: views),
+            ),
+            Material(
+              elevation: 2,
+              child: TabBar(
+                tabs: tabs,
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
-      )
+      ),
     );
   }
 }

@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skill_tamer/data/model/enum/skill_type.dart';
+import 'package:select_bottom_list/select_bottom_list.dart';
 import 'package:skill_tamer/data/model/session/session.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
-import 'package:skill_tamer/views/skill_selection_sheet.dart';
 
 class SessionTimerView extends ConsumerStatefulWidget {
   const SessionTimerView({super.key});
@@ -15,8 +14,7 @@ class SessionTimerView extends ConsumerStatefulWidget {
 }
 
 class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
-  SkillType? skillType;
-  bool _hadSession = false;
+  String? firstSelectedSkillId;
   Timer? _timer;
 
   Duration _remaining = Duration.zero;
@@ -172,20 +170,26 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
     final Session? session = ref.watch(
       playerProvider.select((p) => p.activeSession),
     );
-    if (session != null && skillType == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          skillType = session.sessionSkill;
-        });
-      });
-    }
 
-    if (_hadSession && session == null && skillType != null) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() => skillType = null),
-      );
+    final skills = ref.read(playerProvider).skills;
+    final List<SelectItem> selectableSkills = [
+      const SelectItem(id: "none", title: "Select Skill"),
+      ...List.generate(
+        skills.length,
+        (index) => SelectItem(
+          id: index.toString(),
+          title: "${skills[index].type.icon}   ${skills[index].type.name}",
+        ),
+      ),
+    ];
+
+    firstSelectedSkillId ??= selectableSkills.first.id;
+
+    String getTitle(String? id) {
+      return selectableSkills
+          .firstWhere((e) => e.id == id, orElse: () => selectableSkills.first)
+          .title;
     }
-    _hadSession = session != null;
 
     final progress = (_total.inSeconds == 0)
         ? 0.0
@@ -239,13 +243,21 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: (session == null && skillType == null)
+                    onPressed: (session == null &&
+                            (firstSelectedSkillId == null ||
+                                firstSelectedSkillId == 'none'))
                         ? null
                         : () {
                             if (session == null) {
-                              controller.createNewSession(
-                                skillType: skillType!,
-                              );
+
+                              final idx = int.tryParse(firstSelectedSkillId!);
+                              if (idx != null &&
+                                  idx >= 0 &&
+                                  idx < skills.length) {
+                                controller.createNewSession(
+                                  skillType: skills[idx].type,
+                                );
+                              }
                             } else {
                               controller.stopSession(manual: true);
                             }
@@ -256,40 +268,20 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
 
                 const SizedBox(height: 12),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: session != null
-                        ? null
-                        : () async {
-                            final selected =
-                                await showModalBottomSheet<SkillType>(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (_) => const SkillSelectionSheet(),
-                                );
-
-                            if (selected != null) {
-                              setState(() {
-                                skillType = selected;
-                              });
-                            }
-                          },
-                    child: skillType == null
-                        ? const Text("Select Skill")
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                skillType!.icon,
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(skillType!.name),
-                            ],
-                          ),
-                  ),
-                ),
+                            SelectBottomList(
+              titleTextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              selectedTitleStyle: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
+              data: selectableSkills,
+              selectedId: firstSelectedSkillId!,
+              selectedTitle: getTitle(firstSelectedSkillId),
+              onChange: (id, title) {
+                setState(() {
+                  firstSelectedSkillId = id;
+                });
+              },
+              isDisable: false,
+            ),
 
                 const SizedBox(height: 12),
 

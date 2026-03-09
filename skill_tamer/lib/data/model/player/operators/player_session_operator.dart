@@ -87,14 +87,16 @@ extension PlayerSessionOperator on Player {
     newSkills.removeWhere((s) => s.type == session.sessionSkill);
     newSkills.add(selectedSkill);
 
-    // Add XP to player total
     int newPlayerXp = xpGained + reward;
+    List<Reward> newReward = List.from(rewards);
+    newReward.removeWhere((r) => r.type == RewardType.sessionBoost && r.isActive == true);
 
     return copyWith(
       skills: newSkills,
       activeSession: null,
       activeSessionSet: true,
       xpGained: newPlayerXp,
+      rewards: newReward,
     );
   }
 

@@ -5,17 +5,23 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 const HomeAppBar({ super.key});
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
 
     return AppBar(
-      title: Text("Skill Timer"),
+      title: const Row(
+        children: [
+          Text("Skill Tamer"),
+        ],
+      ),
       titleTextStyle: TextStyle(
         color: scheme.onPrimary,
-        fontSize: 25,
-        fontWeight: FontWeight.bold
+        fontSize: 26,
+        fontWeight: FontWeight.w600,
       ),
       backgroundColor: scheme.primary,
+      elevation: 1,
+      centerTitle: false,
     );
   }
   
