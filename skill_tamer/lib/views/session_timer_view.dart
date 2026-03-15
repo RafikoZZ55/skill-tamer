@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:select_bottom_list/select_bottom_list.dart';
+import 'package:skill_tamer/components/session_multiplyer_card.dart';
+import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/model/session/session.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
-import 'package:skill_tamer/data/model/reward/session_boost.dart';
 
 class SessionTimerView extends ConsumerStatefulWidget {
   const SessionTimerView({super.key});
@@ -42,7 +44,7 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
   void _startTimer() {
     _timer?.cancel();
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(AppDurations.oneSecond, (_) {
       final Session? session = ref.read(playerProvider).activeSession;
 
       if (session == null) {
@@ -80,13 +82,15 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
       final now = DateTime.now();
       if (!_showingAbandonDialog &&
           nowMs - session.lastSessionCheck >
-              const Duration(minutes: 15).inMilliseconds) {
+              AppDurations.sessionAbandonedCheckDuration.inMilliseconds) {
         _abandonPopupStart = now;
-        _popupRemainingNotifier.value = const Duration(minutes: 5);
+        _popupRemainingNotifier.value =
+            AppDurations.sessionAbandonPopupDuration;
         _showAbandonDialog();
       } else if (_showingAbandonDialog && _abandonPopupStart != null) {
         final elapsedPopup = now.difference(_abandonPopupStart!);
-        final remainingPopup = const Duration(minutes: 5) - elapsedPopup;
+        final remainingPopup =
+            AppDurations.sessionAbandonPopupDuration - elapsedPopup;
         if (remainingPopup <= Duration.zero) {
           _popupRemainingNotifier.value = Duration.zero;
           _endAbandonSession();
@@ -102,8 +106,8 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
   }
 
   String _format(Duration d) {
-    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final String minutes = max(d.inMinutes, 0).remainder(60).toString().padLeft(2, '0');
+    final String seconds = max(d.inSeconds, 0).remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
@@ -119,7 +123,7 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
           valueListenable: _popupRemainingNotifier,
           builder: (context, value, _) {
             return Text(
-              'To keep users from spaming sessions while they sleep you need to interact with the app every 15 minutes your time windfow is 5 minutes'
+              'To keep users from spaming sessions while they sleep you need to interact with the app every ${AppDurations.sessionAbandonedCheckDuration.inMinutes} minutes your time windfow is ${AppDurations.sessionAbandonPopupDuration.inMinutes} minutes'
               'Tap "Continue" within ${_format(value)} to keep going, '
               'if you wont do it you will get smaller rewards',
             );
@@ -233,9 +237,7 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
               ),
             ],
           ),
-
           const SizedBox(height: 40),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 35),
             child: Column(
@@ -249,7 +251,6 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
                         ? null
                         : () {
                             if (session == null) {
-
                               final idx = int.tryParse(firstSelectedSkillId!);
                               if (idx != null &&
                                   idx >= 0 &&
@@ -265,32 +266,24 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
                     child: Text(session == null ? "Start" : "Stop"),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
-                            SelectBottomList(
-              titleTextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              selectedTitleStyle: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
-              data: selectableSkills,
-              selectedId: firstSelectedSkillId!,
-              selectedTitle: getTitle(firstSelectedSkillId),
-              onChange: (id, title) {
-                setState(() {
-                  firstSelectedSkillId = id;
-                });
-              },
-              isDisable: false,
-            ),
-
+                SelectBottomList(
+                  titleTextStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                  selectedTitleStyle: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.primary),
+                  data: selectableSkills,
+                  selectedId: firstSelectedSkillId!,
+                  selectedTitle: getTitle(firstSelectedSkillId),
+                  onChange: (id, title) =>
+                      setState(() => firstSelectedSkillId = id),
+                  isDisable: false,
+                ),
                 const SizedBox(height: 12),
-
-                if (session != null) ...[
-                  _buildSessionMultiplierCard(ref, scheme),
-                ],
-
+                if (session != null) SessionMultiplyerCard(),
                 const SizedBox(height: 12),
-
                 session != null
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +296,7 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
                             ),
                           ),
                           Text(
-                            "  next check at : ${_format(Duration(milliseconds: (session.lastSessionCheck + Duration(minutes: 15).inMilliseconds) - DateTime.now().millisecondsSinceEpoch))}",
+                            "  next check at : ${_format(Duration(milliseconds: (session.lastSessionCheck + AppDurations.sessionAbandonedCheckDuration.inMilliseconds) - DateTime.now().millisecondsSinceEpoch))}",
                           ),
                         ],
                       )
@@ -312,44 +305,6 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSessionMultiplierCard(WidgetRef ref, ColorScheme scheme) {
-    final player = ref.read(playerProvider);
-    final sessionBoosts = player.rewards
-        .whereType<SessionBoost>()
-        .where((r) => r.isActive)
-        .toList();
-    double totalMultiplier = sessionBoosts.fold(
-      0.0,
-      (sum, boost) => sum + boost.sessionBoostMultiplyer,
-    );
-
-    return Card(
-      color: totalMultiplier > 0
-          ? scheme.secondaryContainer
-          : scheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              '📢 Session Multiplier:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'x${(1.0 + totalMultiplier).toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: scheme.primary,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

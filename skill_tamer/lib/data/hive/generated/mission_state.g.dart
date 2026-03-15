@@ -1,10 +1,10 @@
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of '../mission_state.dart';
 
-
-
-
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class MissionStateAdapter extends TypeAdapter<MissionState> {
   @override
@@ -19,17 +19,20 @@ class MissionStateAdapter extends TypeAdapter<MissionState> {
     return MissionState(
       attributeCheck: (fields[1] as Map).cast<String, int>(),
       type: fields[0] as String,
+      isComplete: fields[2] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, MissionState obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.type)
       ..writeByte(1)
-      ..write(obj.attributeCheck);
+      ..write(obj.attributeCheck)
+      ..writeByte(2)
+      ..write(obj.isComplete);
   }
 
   @override

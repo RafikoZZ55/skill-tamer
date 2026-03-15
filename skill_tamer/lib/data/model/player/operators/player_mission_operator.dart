@@ -20,7 +20,7 @@ extension PlayerMissionOperator on Player {
       remainingPoints--;
     }
 
-    return Mission(type: missionType, attributeCheck: attributeCheck);
+    return Mission(type: missionType, attributeCheck: attributeCheck, isComplete: false);
   }
 
   bool isMissionExpierd() {
@@ -48,9 +48,7 @@ extension PlayerMissionOperator on Player {
 
   Player refreshMission() {
     Mission newMission = _generateMission();
-    int newNextMissionRefreshAt =
-        DateTime.now().millisecondsSinceEpoch +
-        Duration(hours: 1).inMilliseconds;
+    int newNextMissionRefreshAt = DateTime.now().millisecondsSinceEpoch + AppDurations.missionRefreshDuration.inMilliseconds;
     return copyWith(
       currentMission: newMission,
       nextMissionRefreshAt: newNextMissionRefreshAt,
@@ -119,6 +117,10 @@ extension PlayerMissionOperator on Player {
       case RewardType.temporaryAttributeBoost: newReward = TemporaryAttributeBoost(
         attributesBoostAmount: {SkillAttributeType.getRandom(): 2}
       );
+      break;
+      case RewardType.instantMission:
+      newReward = InstantMission();
+      break;
     }
     return newReward;
 

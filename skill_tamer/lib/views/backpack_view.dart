@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'backpack_reward_view.dart';
 import 'backpack_skill_view.dart';
 
@@ -41,12 +42,10 @@ class _BackpackViewState extends ConsumerState<BackpackView> {
               });
             },
           ),
-
           const SizedBox(height: 16),
-
           Expanded(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
+              duration: AppDurations.shortAnimationDuration,
               switchInCurve: Curves.easeOut,
               switchOutCurve: Curves.easeIn,
               transitionBuilder: (child, animation) {

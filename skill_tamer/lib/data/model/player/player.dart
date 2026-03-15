@@ -1,14 +1,17 @@
 import 'dart:math';
+import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/model/enum/mission_type.dart';
 import 'package:skill_tamer/data/model/enum/reward_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/mission/mission.dart';
+import 'package:skill_tamer/data/model/reward/instant_mission.dart';
 import 'package:skill_tamer/data/model/reward/redistribute_attribute_points.dart';
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
 import 'package:skill_tamer/data/model/reward/temporary_attribute_boost.dart';
 import 'package:skill_tamer/data/model/session/session.dart';
+import 'package:skill_tamer/data/model/session/session_history.dart';
 import 'package:skill_tamer/data/model/skill/skill.dart';
 
 part 'operators/player_mission_operator.dart';
@@ -24,6 +27,7 @@ class Player {
   Mission? currentMission;
   int nextMissionRefreshAt;
   Session? activeSession;
+  List<SessionHistory> sessionHistory;
 
 
   Player({
@@ -34,6 +38,7 @@ class Player {
     required this.lastRefreshAt,
     this.currentMission,
     this.activeSession,
+    required this.sessionHistory,
   });
 
   static Player empty(){
@@ -43,6 +48,7 @@ class Player {
       rewards: [], 
       lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
       nextMissionRefreshAt: DateTime.now().millisecondsSinceEpoch,
+      sessionHistory: []
     );
   }
 
@@ -56,6 +62,7 @@ class Player {
     int? xpGained,
     int? nextMissionRefreshAt,
     Map<SkillAttributeType,int>? totalSkillBoost,
+    List<SessionHistory>? sessionHistory,
   }) {
     return Player(
       activeSession: activeSessionSet ? activeSession : this.activeSession,
@@ -65,13 +72,14 @@ class Player {
       rewards: rewards ?? List.from(this.rewards),
       lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
       nextMissionRefreshAt: nextMissionRefreshAt ?? this.nextMissionRefreshAt, 
+      sessionHistory: sessionHistory ?? List.from(this.sessionHistory)
     );
   }
 
   int getLevel() {
     int level = 0;
     int xpLeft = xpGained;
-    int xpForNext = 4000;
+    int xpForNext = 1000;
     double growth = 1.12;
 
     while (level < 50 && xpLeft >= xpForNext) {
@@ -82,9 +90,23 @@ class Player {
     return level;
   }
 
+  int _totalXPForLevel(int level) {
+    int total = 0;
+    for (int i = 0; i < level; i++) {
+      total += (1000 * pow(1.12, i)).round();
+    }
+    return total;
+  }
+
+  int xpGainedForNextLevel() {
+    int level = getLevel();
+    int xpUsed = _totalXPForLevel(level);
+    return xpGained - xpUsed;
+  }
+
   int xpToNextLevel() {
     int level = getLevel();
-    int xpForNext = (5000 * pow(1.12, level)).round();
-    return xpForNext - xpGained;
+    int totalForNext = _totalXPForLevel(level + 1);
+    return totalForNext - xpGained;
   }
 }

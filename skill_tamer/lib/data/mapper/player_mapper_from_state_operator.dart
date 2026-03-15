@@ -51,6 +51,12 @@ extension PlayerMapperFromStateOperator on PlayerMapper {
           isActive: rewardState.isActive,
         );
       }
+ break;
+      case RewardType.instantMission:
+        reward = InstantMission(
+          isActive: rewardState.isActive
+        );
+        break;
     }
     
     return reward;
@@ -69,6 +75,7 @@ extension PlayerMapperFromStateOperator on PlayerMapper {
     return Mission(
       type: MissionType.get(missionName: missionState.type), 
       attributeCheck: _fromSkillAttributeStateMap(attributesState: missionState.attributeCheck),
+      isComplete: missionState.isComplete
     );
   }
 

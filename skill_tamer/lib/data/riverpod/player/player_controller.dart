@@ -1,8 +1,8 @@
 import 'dart:async';
 
-
 import 'package:hive/hive.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/hive/player_state.dart';
 import 'package:skill_tamer/data/mapper/player_mapper.dart';
 import 'package:skill_tamer/data/model/enum/reward_type.dart';
@@ -11,6 +11,7 @@ import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'dart:math';
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/player/player.dart';
+import 'package:skill_tamer/data/model/mission/mission.dart';
 
 class MissionOutcome {
   final bool success;
@@ -32,7 +33,7 @@ class PlayerController extends StateNotifier<Player> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
+    _timer = Timer.periodic(AppDurations.tickDuration, (_) => _onTick());
   }
 
   void _loadFromHive() {
@@ -77,10 +78,8 @@ class PlayerController extends StateNotifier<Player> {
     if (state.areSkillsEmpty()) _setState(player: state.refreshSkills());
 
     _setState(
-      player: state.copyWith(
-        lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
-      ),
-    );
+        player: state.copyWith(
+            lastRefreshAt: DateTime.now().millisecondsSinceEpoch));
   }
 
   void upgradeSkill({
@@ -88,8 +87,8 @@ class PlayerController extends StateNotifier<Player> {
     required SkillAttributeType attribute,
   }) {
     _setState(
-      player: state.upgradeSkill(skillIndex: skillIndex, attribute: attribute),
-    );
+        player:
+            state.upgradeSkill(skillIndex: skillIndex, attribute: attribute));
     _save();
   }
 
@@ -117,7 +116,9 @@ class PlayerController extends StateNotifier<Player> {
   }
 
   void useReward({required int rewardIndex, int? skillIndex}) {
-    _setState(player: state.useReward(rewardIndex: rewardIndex, skillIndex: skillIndex));
+    _setState(
+        player:
+            state.useReward(rewardIndex: rewardIndex, skillIndex: skillIndex));
     _save();
   }
 
@@ -135,14 +136,17 @@ class PlayerController extends StateNotifier<Player> {
       xpReward = newPlayer.calculateMissionXpReward(newPlayer.currentMission!);
       newPlayer = newPlayer.copyWith(xpGained: newPlayer.xpGained + xpReward);
     }
-    List<Reward> newRewards = List.from(state.rewards);
-    newRewards.removeWhere((r) => r.type == RewardType.temporaryAttributeBoost && r.isActive == true);
+    List<Reward> newRewards = List.from(newPlayer.rewards);
+    newRewards.removeWhere((r) =>
+        r.type == RewardType.temporaryAttributeBoost && r.isActive == true);
 
-    final nextRefresh =
-        DateTime.now().millisecondsSinceEpoch +
-        Duration(hours: 1).inMilliseconds;
+    final nextRefresh = DateTime.now().millisecondsSinceEpoch +
+        AppDurations.missionRefreshDuration.inMilliseconds;
+    Mission? updatedMission =
+        newPlayer.currentMission?.copyWith(isComplete: true);
+
     newPlayer = newPlayer.copyWith(
-      currentMission: null,
+      currentMission: updatedMission,
       nextMissionRefreshAt: nextRefresh,
       totalSkillBoost: {},
       rewards: newRewards,
@@ -161,9 +165,7 @@ class PlayerController extends StateNotifier<Player> {
     final prob = state.computeMissionProbability(mission: mission, a: a, b: b);
     final success = Random().nextDouble() < prob;
     Reward? reward;
-    if (success) {
-      reward = state.generateMissionReward();
-    }
+    if (success) reward = state.generateMissionReward();
 
     completeMissionResult(success: success, reward: reward);
     return MissionOutcome(success, reward: reward);

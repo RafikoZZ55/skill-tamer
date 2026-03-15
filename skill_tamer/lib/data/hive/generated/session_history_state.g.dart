@@ -1,38 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../session_state.dart';
+part of '../session_history_state.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SessionStateAdapter extends TypeAdapter<SessionState> {
+class SessionHistoryStateAdapter extends TypeAdapter<SessionHistoryState> {
   @override
-  final int typeId = 1;
+  final int typeId = 5;
 
   @override
-  SessionState read(BinaryReader reader) {
+  SessionHistoryState read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SessionState(
-      timeStarted: fields[0] as int,
-      lastSessionCheck: fields[1] as int,
-      sessionSkill: fields[2] as String,
+    return SessionHistoryState(
+      completedAt: fields[2] as int,
+      duration: fields[0] as Duration,
+      skillType: fields[1] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, SessionState obj) {
+  void write(BinaryWriter writer, SessionHistoryState obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.timeStarted)
+      ..write(obj.duration)
       ..writeByte(1)
-      ..write(obj.lastSessionCheck)
+      ..write(obj.skillType)
       ..writeByte(2)
-      ..write(obj.sessionSkill);
+      ..write(obj.completedAt);
   }
 
   @override
@@ -41,7 +41,7 @@ class SessionStateAdapter extends TypeAdapter<SessionState> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SessionStateAdapter &&
+      other is SessionHistoryStateAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

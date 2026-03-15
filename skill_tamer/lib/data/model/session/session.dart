@@ -1,3 +1,4 @@
+import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 
 class Session {
@@ -6,32 +7,30 @@ class Session {
   int lastSessionCheck;
   SkillType sessionSkill;
 
-  Session({
-    required this.timeStarted,
-    required this.sessionSkill,
-    int? lastSessionCheck
-  }): lastSessionCheck = lastSessionCheck ?? timeStarted;
+  Session(
+      {required this.timeStarted,
+      required this.sessionSkill,
+      int? lastSessionCheck})
+      : lastSessionCheck = lastSessionCheck ?? timeStarted;
 
   Session copyWith({
-  int? timeStarted,
-  int? lastSessionCheck,
-  SkillType? sessionSkill,   
+    int? timeStarted,
+    int? lastSessionCheck,
+    SkillType? sessionSkill,
   }) {
     return Session(
-      timeStarted: timeStarted ?? this.timeStarted, 
-      sessionSkill: sessionSkill ?? this.sessionSkill,
-      lastSessionCheck: lastSessionCheck ?? this.lastSessionCheck 
-    );
+        timeStarted: timeStarted ?? this.timeStarted,
+        sessionSkill: sessionSkill ?? this.sessionSkill,
+        lastSessionCheck: lastSessionCheck ?? this.lastSessionCheck);
   }
 
-
   bool isFinished() {
-    return DateTime.now().millisecondsSinceEpoch - timeStarted
-        >= sessionSkill.recommendedSessionDuration.inMilliseconds;
+    return DateTime.now().millisecondsSinceEpoch - timeStarted >=
+        sessionSkill.recommendedSessionDuration.inMilliseconds;
   }
 
   bool isAbandoned() {
-    return DateTime.now().millisecondsSinceEpoch - lastSessionCheck > const Duration(minutes: 15).inMilliseconds;
+    return DateTime.now().millisecondsSinceEpoch - lastSessionCheck >
+        AppDurations.sessionAbandonedCheckDuration.inMilliseconds;
   }
-
 }

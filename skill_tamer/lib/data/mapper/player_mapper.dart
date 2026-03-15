@@ -10,6 +10,7 @@ import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/mission/mission.dart';
 import 'package:skill_tamer/data/model/player/player.dart';
+import 'package:skill_tamer/data/model/reward/instant_mission.dart';
 import 'package:skill_tamer/data/model/reward/redistribute_attribute_points.dart';
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';

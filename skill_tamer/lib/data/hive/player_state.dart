@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:skill_tamer/data/hive/mission_state.dart';
 import 'package:skill_tamer/data/hive/reward_state.dart';
+import 'package:skill_tamer/data/hive/session_history_state.dart';
 import 'package:skill_tamer/data/hive/session_state.dart';
 import 'package:skill_tamer/data/hive/skill_state.dart';
 
@@ -30,6 +31,9 @@ class PlayerState {
   @HiveField(6)
   SessionState? activeSession;
 
+  @HiveField(7)
+  List<SessionHistoryState> sessionHistory;
+
 
   PlayerState({
     required this.xpGained,
@@ -39,7 +43,7 @@ class PlayerState {
     required this.nextMissionRefreshAt,
     this.currentMission,
     this.activeSession,
-
+    required this.sessionHistory,
   });
 
 }

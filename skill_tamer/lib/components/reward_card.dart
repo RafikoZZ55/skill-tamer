@@ -4,6 +4,7 @@ import 'package:skill_tamer/data/model/reward/redistribute_attribute_points.dart
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/temporary_attribute_boost.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
+import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
 
 class RewardCard extends ConsumerStatefulWidget {
@@ -24,9 +25,10 @@ class _RewardCardState extends ConsumerState<RewardCard> {
     final scheme = Theme.of(context).colorScheme;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: AppDurations.shortAnimationDuration,
       decoration: BoxDecoration(
-        color: reward.isActive ? scheme.primaryContainer : scheme.surfaceContainer,
+        color:
+            reward.isActive ? scheme.primaryContainer : scheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: reward.isActive ? scheme.primary : scheme.outlineVariant,
@@ -34,9 +36,9 @@ class _RewardCardState extends ConsumerState<RewardCard> {
         ),
         boxShadow: [
           BoxShadow(
-            color: reward.isActive 
-              ? scheme.primary.withAlpha(50)
-              : scheme.shadow.withAlpha(50),
+            color: reward.isActive
+                ? scheme.primary.withAlpha(50)
+                : scheme.shadow.withAlpha(50),
             blurRadius: reward.isActive ? 14 : 8,
             offset: Offset(0, reward.isActive ? 6 : 2),
             spreadRadius: reward.isActive ? 2 : 0,
@@ -117,7 +119,9 @@ class _RewardCardState extends ConsumerState<RewardCard> {
               ),
               if (reward.isActive)
                 Chip(
-                  label: const Text('Applied', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
+                  label: const Text('Applied',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
                   backgroundColor: scheme.primary,
                   labelStyle: TextStyle(color: scheme.onPrimary),
                   side: BorderSide.none,
@@ -130,7 +134,8 @@ class _RewardCardState extends ConsumerState<RewardCard> {
             runSpacing: 8,
             children: reward.attributesBoostAmount.entries.map((e) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: scheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(8),
@@ -195,7 +200,9 @@ class _RewardCardState extends ConsumerState<RewardCard> {
               ),
               if (reward.isActive)
                 Chip(
-                  label: const Text('Active', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
+                  label: const Text('Active',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
                   backgroundColor: scheme.primary,
                   labelStyle: TextStyle(color: scheme.onPrimary),
                   side: BorderSide.none,

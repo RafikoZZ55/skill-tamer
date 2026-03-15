@@ -11,8 +11,13 @@ enum RewardType {
     icon: "🏆",
     name: "Redistribute Attribute POints",  
   ),
+  instantMission(
+    icon: "⏰",
+    description: "Insta refreshes next mission timer",
+    name: "Instant Mission"
+  ),
   sessionBoost(
-    icon: "×",
+    icon: "🤫",
     description: "multiplyes next session xp gain",
     name: "Session Boost"
   );

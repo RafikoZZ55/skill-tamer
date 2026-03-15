@@ -1,10 +1,10 @@
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of '../player_state.dart';
 
-
-
-
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class PlayerStateAdapter extends TypeAdapter<PlayerState> {
   @override
@@ -24,6 +24,7 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       nextMissionRefreshAt: fields[5] as int,
       currentMission: fields[4] as MissionState?,
       activeSession: fields[6] as SessionState?,
+      sessionHistory: (fields[7] as List).cast<SessionHistoryState>(),
     );
   }
 
@@ -44,7 +45,9 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       ..writeByte(5)
       ..write(obj.nextMissionRefreshAt)
       ..writeByte(6)
-      ..write(obj.activeSession);
+      ..write(obj.activeSession)
+      ..writeByte(7)
+      ..write(obj.sessionHistory);
   }
 
   @override

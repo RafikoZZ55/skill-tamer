@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skill_tamer/components/home_app_bar.dart';
 import 'package:skill_tamer/views/mission_view.dart';
+import 'package:skill_tamer/views/session_history_view.dart';
 import 'package:skill_tamer/views/session_timer_view.dart';
 import 'package:skill_tamer/views/backpack_view.dart';
 
@@ -12,6 +13,7 @@ const HomePage({ super.key });
     BackpackView(),
     MissionView(),
     SessionTimerView(),
+    SessionHistoryView(),
   ];
 
   static final List<Tab> tabs = [
@@ -24,6 +26,9 @@ const HomePage({ super.key });
     Tab(
       text: "Session",
     ),
+    Tab(
+      text: "History",
+    )
   ];
 
   @override
@@ -31,7 +36,7 @@ const HomePage({ super.key });
     return Scaffold(
       appBar: HomeAppBar(),
       body: DefaultTabController(
-        length: 3,
+        length: 4,
         child: Column(
           children: [
             Expanded(

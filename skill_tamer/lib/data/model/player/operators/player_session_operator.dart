@@ -25,40 +25,31 @@ extension PlayerSessionOperator on Player {
   }
 
   int _calculatePartialReward({required Session session}) {
-    int baseXp =
-        (DateTime.now().millisecondsSinceEpoch - session.timeStarted) ~/ 1000;
-    double multiplyer =
-        session.sessionSkill.xpMultiplier + _getActiveSessionBoostMultiplyer();
+    int baseXp = (DateTime.now().millisecondsSinceEpoch - session.timeStarted) ~/ 1000;
+    double multiplyer = session.sessionSkill.xpMultiplier + _getActiveSessionBoostMultiplyer();
+
     return (baseXp + baseXp * multiplyer).toInt();
   }
 
   int _calculateFullRewards({required Session session}) {
-    int baseXp =
-        (DateTime.now().millisecondsSinceEpoch - session.timeStarted) ~/ 1000;
-    double multiplyer =
-        session.sessionSkill.xpMultiplier +
-        _getActiveSessionBoostMultiplyer() +
-        0.25;
+    int baseXp = (DateTime.now().millisecondsSinceEpoch - session.timeStarted) ~/ 1000;
+    double multiplyer = session.sessionSkill.xpMultiplier + _getActiveSessionBoostMultiplyer() + 0.25;
+
     return (baseXp + baseXp * multiplyer).toInt();
   }
 
   int _calculateBeggerRewards({required Session session}) {
-    int baseXp =
-        (DateTime.now().millisecondsSinceEpoch - session.timeStarted) ~/ 1000;
-    double multiplyer =
-        (session.sessionSkill.xpMultiplier +
-            _getActiveSessionBoostMultiplyer()) /
-        5;
+    int baseXp = (DateTime.now().millisecondsSinceEpoch - session.timeStarted) ~/ 1000;
+    double multiplyer = (session.sessionSkill.xpMultiplier + _getActiveSessionBoostMultiplyer()) / 5;
+
     return (baseXp + baseXp * multiplyer).toInt();
   }
 
-  int _calculateAddedPoints({
-    required int reward,
-    required SkillType skillType,
-  }) {
+  int _calculateAddedPoints({ required int reward, required SkillType skillType }) {
     Skill skill = skills.singleWhere((s) => s.type == skillType).copyWith();
     int currentLevel = skill.getLevel();
     skill.xpGained += reward;
+    
     return skill.getLevel() - currentLevel;
   }
 
@@ -67,18 +58,13 @@ extension PlayerSessionOperator on Player {
     Session? session = activeSession;
     int reward;
 
-    if (session!.isFinished()) {
-      reward = _calculateFullRewards(session: session);
-    } else if (!manual && session.isAbandoned()) {
-      reward = _calculateBeggerRewards(session: session);
-    } else {
-      reward = _calculatePartialReward(session: session);
-    }
+    if (session!.isFinished()) {reward = _calculateFullRewards(session: session);}
+    else if (!manual && session.isAbandoned()) {reward = _calculateBeggerRewards(session: session);} 
+    else {reward = _calculatePartialReward(session: session);}
 
-    Skill selectedSkill = skills
-        .singleWhere((s) => s.type == session.sessionSkill)
-        .copyWith();
+    Skill selectedSkill = skills.singleWhere((s) => s.type == session.sessionSkill).copyWith();
     selectedSkill.xpGained += reward;
+    
     selectedSkill.unspentAttributePoints += _calculateAddedPoints(
       reward: reward,
       skillType: selectedSkill.type,

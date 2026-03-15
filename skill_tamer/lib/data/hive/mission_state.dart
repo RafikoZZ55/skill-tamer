@@ -10,8 +10,12 @@ class MissionState {
   @HiveField(1)
   Map<String,int> attributeCheck;
 
+  @HiveField(2)
+  bool isComplete;
+
   MissionState({
     required this.attributeCheck,
     required this.type,
+    required this.isComplete
   });
 }
