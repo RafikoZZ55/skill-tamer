@@ -113,7 +113,9 @@ extension PlayerMissionOperator on Player {
     late Reward newReward;
     switch (rewardType) {
       case RewardType.redistributeAttributePoints: newReward = RedistributeAttributePoints();
+      break;
       case RewardType.sessionBoost: newReward = SessionBoost(sessionBoostMultiplyer: Random().nextInt(4) / 10 + 1,);
+      break;
       case RewardType.temporaryAttributeBoost: newReward = TemporaryAttributeBoost(
         attributesBoostAmount: {SkillAttributeType.getRandom(): 2}
       );
