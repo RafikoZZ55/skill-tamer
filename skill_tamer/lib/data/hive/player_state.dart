@@ -32,7 +32,7 @@ class PlayerState {
   SessionState? activeSession;
 
   @HiveField(7)
-  List<SessionHistoryState> sessionHistory;
+  List<SessionHistoryState> sessionsHistory;
 
 
   PlayerState({
@@ -43,7 +43,7 @@ class PlayerState {
     required this.nextMissionRefreshAt,
     this.currentMission,
     this.activeSession,
-    required this.sessionHistory,
+    required this.sessionsHistory,
   });
 
 }

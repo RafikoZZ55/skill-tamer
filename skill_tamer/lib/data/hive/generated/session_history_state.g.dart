@@ -17,8 +17,9 @@ class SessionHistoryStateAdapter extends TypeAdapter<SessionHistoryState> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SessionHistoryState(
+      status: fields[3] as String,
       completedAt: fields[2] as int,
-      duration: fields[0] as Duration,
+      duration: fields[0] as int,
       skillType: fields[1] as String,
     );
   }
@@ -26,13 +27,15 @@ class SessionHistoryStateAdapter extends TypeAdapter<SessionHistoryState> {
   @override
   void write(BinaryWriter writer, SessionHistoryState obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.duration)
       ..writeByte(1)
       ..write(obj.skillType)
       ..writeByte(2)
-      ..write(obj.completedAt);
+      ..write(obj.completedAt)
+      ..writeByte(3)
+      ..write(obj.status);
   }
 
   @override

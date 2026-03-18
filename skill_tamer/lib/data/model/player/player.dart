@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/model/enum/mission_type.dart';
 import 'package:skill_tamer/data/model/enum/reward_type.dart';
+import 'package:skill_tamer/data/model/enum/session_status_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/mission/mission.dart';
@@ -27,7 +28,7 @@ class Player {
   Mission? currentMission;
   int nextMissionRefreshAt;
   Session? activeSession;
-  List<SessionHistory> sessionHistory;
+  List<SessionHistory> sessionsHistory;
 
 
   Player({
@@ -38,7 +39,7 @@ class Player {
     required this.lastRefreshAt,
     this.currentMission,
     this.activeSession,
-    required this.sessionHistory,
+    required this.sessionsHistory,
   });
 
   static Player empty(){
@@ -48,7 +49,7 @@ class Player {
       rewards: [], 
       lastRefreshAt: DateTime.now().millisecondsSinceEpoch,
       nextMissionRefreshAt: DateTime.now().millisecondsSinceEpoch,
-      sessionHistory: []
+      sessionsHistory: []
     );
   }
 
@@ -62,7 +63,7 @@ class Player {
     int? xpGained,
     int? nextMissionRefreshAt,
     Map<SkillAttributeType,int>? totalSkillBoost,
-    List<SessionHistory>? sessionHistory,
+    List<SessionHistory>? sessionsHistory,
   }) {
     return Player(
       activeSession: activeSessionSet ? activeSession : this.activeSession,
@@ -72,7 +73,7 @@ class Player {
       rewards: rewards ?? List.from(this.rewards),
       lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
       nextMissionRefreshAt: nextMissionRefreshAt ?? this.nextMissionRefreshAt, 
-      sessionHistory: sessionHistory ?? List.from(this.sessionHistory)
+      sessionsHistory: sessionsHistory ?? List.from(this.sessionsHistory)
     );
   }
 

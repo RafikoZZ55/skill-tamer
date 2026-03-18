@@ -97,6 +97,29 @@ extension PlayerSessionOperator on Player {
     return updatedPlayer;
   }
 
+  Player addSessionHistory(){
+    if(activeSession == null) return copyWith();
+    
+    late SessionStatusType status;
+    
+    if(activeSession!.isAbandoned() == true) {status = SessionStatusType.completed; }
+    if(activeSession!.isFinished() == true) {status = SessionStatusType.fullyCompleted; }
+    if(activeSession!.isFailed() == true) {status = SessionStatusType.abandoned; }
+
+    SessionHistory newSessionHistory = SessionHistory(
+      status: status,
+      duration: DateTime.now().millisecondsSinceEpoch -  activeSession!.timeStarted, 
+      skillType: activeSession!.sessionSkill,
+      completedAt: DateTime.now().millisecondsSinceEpoch,
+    );
+
+    List<SessionHistory> newSessionsHistory = List.from(sessionsHistory);
+    newSessionsHistory.add(newSessionHistory);
+
+    return copyWith(sessionsHistory: newSessionsHistory);
+
+  }
+
   Player updateSessionCheck() {
     if (activeSession == null) return copyWith();
     final updated = activeSession!.copyWith(

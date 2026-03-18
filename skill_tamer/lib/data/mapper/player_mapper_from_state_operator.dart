@@ -87,6 +87,19 @@ extension PlayerMapperFromStateOperator on PlayerMapper {
     );
   }
 
+  SessionHistory _fromSessionHistoryState({required SessionHistoryState sessionHistoryState }){
+    return SessionHistory(
+      status: SessionStatusType.get(sessionStatusType: sessionHistoryState.status),
+      duration: sessionHistoryState.duration, 
+      skillType: SkillType.get(skillName: sessionHistoryState.skillType), 
+      completedAt: sessionHistoryState.completedAt
+    );
+  }
+
+  List<SessionHistory> _fromSessionsHistoryState({required List<SessionHistoryState> sessionsHistoryState}){
+    return sessionsHistoryState.map((e) => _fromSessionHistoryState(sessionHistoryState: e)).toList();
+  }
+
   Map<SkillAttributeType,int> _fromSkillAttributeStateMap({required Map<String,int> attributesState}){
     Map<SkillAttributeType,int> attributes = {};
 

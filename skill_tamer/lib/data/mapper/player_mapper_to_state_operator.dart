@@ -22,6 +22,19 @@ extension PlayerMapperToStateOperator on PlayerMapper {
     return rewardState; 
   }
 
+  SessionHistoryState _toSessionHistoryState({required SessionHistory sessionHistory}){
+    return SessionHistoryState(
+      status: sessionHistory.status.name,
+      completedAt: sessionHistory.completedAt, 
+      duration: sessionHistory.duration, 
+      skillType: sessionHistory.skillType.name
+    );
+  }
+
+  List<SessionHistoryState> _toSessionsHistoryState({required List<SessionHistory> sessionsHistory}) {
+    return sessionsHistory.map((e) => _toSessionHistoryState(sessionHistory: e)).toList();
+  }
+
 
   RewardState _toRewardState({required Reward reward}){
     RewardState rewardState;

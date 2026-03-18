@@ -24,7 +24,7 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       nextMissionRefreshAt: fields[5] as int,
       currentMission: fields[4] as MissionState?,
       activeSession: fields[6] as SessionState?,
-      sessionHistory: (fields[7] as List).cast<SessionHistoryState>(),
+      sessionsHistory: (fields[7] as List).cast<SessionHistoryState>(),
     );
   }
 
@@ -47,7 +47,7 @@ class PlayerStateAdapter extends TypeAdapter<PlayerState> {
       ..writeByte(6)
       ..write(obj.activeSession)
       ..writeByte(7)
-      ..write(obj.sessionHistory);
+      ..write(obj.sessionsHistory);
   }
 
   @override

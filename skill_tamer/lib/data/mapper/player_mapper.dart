@@ -1,4 +1,5 @@
 
+import 'package:skill_tamer/data/hive/session_history_state.dart';
 import 'package:skill_tamer/data/hive/session_state.dart';
 import 'package:skill_tamer/data/hive/mission_state.dart';
 import 'package:skill_tamer/data/hive/player_state.dart';
@@ -6,6 +7,7 @@ import 'package:skill_tamer/data/hive/reward_state.dart';
 import 'package:skill_tamer/data/hive/skill_state.dart';
 import 'package:skill_tamer/data/model/enum/mission_type.dart';
 import 'package:skill_tamer/data/model/enum/reward_type.dart';
+import 'package:skill_tamer/data/model/enum/session_status_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_attribute_type.dart';
 import 'package:skill_tamer/data/model/enum/skill_type.dart';
 import 'package:skill_tamer/data/model/mission/mission.dart';
@@ -16,6 +18,7 @@ import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
 import 'package:skill_tamer/data/model/reward/temporary_attribute_boost.dart';
 import 'package:skill_tamer/data/model/session/session.dart';
+import 'package:skill_tamer/data/model/session/session_history.dart';
 import 'package:skill_tamer/data/model/skill/skill.dart';
 
 part './player_mapper_from_state_operator.dart';
@@ -32,6 +35,7 @@ class PlayerMapper {
       lastRefreshAt: playerState.lastRefreshAt,
       currentMission: playerState.currentMission == null ? null : _formCurrentMissionState(missionState: playerState.currentMission!),
       activeSession: playerState.activeSession == null ? null : _fromActiveSessionState(sessionState: playerState.activeSession!),
+      sessionsHistory: _fromSessionsHistoryState(sessionsHistoryState: playerState.sessionsHistory)
     );
   }
 
@@ -44,6 +48,7 @@ class PlayerMapper {
       nextMissionRefreshAt: player.nextMissionRefreshAt,
       currentMission: player.currentMission == null ? null : _toCurrentMissionState(missionState: player.currentMission!),
       activeSession: player.activeSession == null? null: _toActiveSessionState(sessionState: player.activeSession!),
+      sessionsHistory: _toSessionsHistoryState(sessionsHistory: player.sessionsHistory)
     );
   }
 }

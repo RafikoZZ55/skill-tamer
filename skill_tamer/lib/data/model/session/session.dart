@@ -33,4 +33,9 @@ class Session {
     return DateTime.now().millisecondsSinceEpoch - lastSessionCheck >
         AppDurations.sessionAbandonedCheckDuration.inMilliseconds;
   }
+
+  bool isFailed() {
+      return DateTime.now().millisecondsSinceEpoch - lastSessionCheck >
+        AppDurations.sessionAbandonedCheckDuration.inMilliseconds + AppDurations.sessionAbandonPopupDuration.inMilliseconds;
+  }
 }
