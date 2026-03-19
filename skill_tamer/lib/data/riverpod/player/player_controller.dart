@@ -77,18 +77,14 @@ class PlayerController extends StateNotifier<Player> {
     if (state.isMissionExpierd()) _setState(player: state.refreshMission());
     if (state.areSkillsEmpty()) _setState(player: state.refreshSkills());
 
-    _setState(
-        player: state.copyWith(
-            lastRefreshAt: DateTime.now().millisecondsSinceEpoch));
+    _setState(player: state.copyWith(lastRefreshAt: DateTime.now().millisecondsSinceEpoch));
   }
 
   void upgradeSkill({
     required int skillIndex,
     required SkillAttributeType attribute,
   }) {
-    _setState(
-        player:
-            state.upgradeSkill(skillIndex: skillIndex, attribute: attribute));
+    _setState(player: state.upgradeSkill(skillIndex: skillIndex, attribute: attribute));
     _save();
   }
 
@@ -98,6 +94,7 @@ class PlayerController extends StateNotifier<Player> {
   }
 
   void stopSession({bool manual = false}) {
+    _setState(player: state.addSessionHistory());
     _setState(player: state.stopSession(manual: manual));
     _save();
   }
