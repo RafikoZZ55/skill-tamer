@@ -52,7 +52,6 @@ extension PlayerMissionOperator on Player {
     return copyWith(
       currentMission: newMission,
       nextMissionRefreshAt: newNextMissionRefreshAt,
-      totalSkillBoost: {},
     );
   }
 

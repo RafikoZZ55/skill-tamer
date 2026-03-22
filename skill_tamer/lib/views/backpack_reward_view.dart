@@ -22,7 +22,7 @@ class _BackpackRewardViewState extends ConsumerState<BackpackRewardView> {
         maxCrossAxisExtent: 220,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 1,
+        childAspectRatio: 0.8,
       ),     
       itemBuilder: (context, index) => RewardCard(rewardIndex: index),
     );

@@ -12,11 +12,6 @@ class Mission {
     required this.isComplete,
   });
 
-  /// Creates a copy of the mission with any given fields replaced.
-  ///
-  /// This is used by the controller/operator when marking a mission as
-  /// completed or regenerating one. Fields that are not passed will remain
-  /// unchanged.
   Mission copyWith({
     MissionType? type,
     Map<SkillAttributeType, int>? attributeCheck,

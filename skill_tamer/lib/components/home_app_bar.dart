@@ -3,67 +3,93 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skill_tamer/data/model/player/player.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
 
-
 class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
-const HomeAppBar({ super.key});
+  const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ColorScheme scheme = Theme.of(context).colorScheme;
-    Player player = ref.watch(playerProvider);
+    final scheme = Theme.of(context).colorScheme;
+    final Player player = ref.watch(playerProvider);
+
+    final currentXP = player.xpGainedForNextLevel();
+    final remainingXP = player.xpToNextLevel();
+    final totalXPForLevel = currentXP + remainingXP;
+
+    final progress = totalXPForLevel == 0 ? 0.0 : currentXP / totalXPForLevel;
 
     return AppBar(
-      title: Text("Skill Tamer"),
+      title: const Text("SKILL TAMER"),
       bottom: PreferredSize(
-        preferredSize: Size.fromHeight(4.0),
-
+        preferredSize: const Size.fromHeight(20),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               LinearProgressIndicator(
-                  value: player.xpGainedForNextLevel() / player.xpToNextLevel(),
-                  backgroundColor: const Color.fromARGB(120, 0, 0, 0),
-                  color: scheme.onPrimary,
-                  minHeight: 6,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                Text(
-                  " ${player.xpGainedForNextLevel()} / ${player.xpToNextLevel()}xp",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: scheme.onPrimary,
-                    fontWeight: FontWeight.w600
+              LinearProgressIndicator(
+                value: progress.clamp(0.0, 1.0),
+                backgroundColor: scheme.primary.withAlpha(26),
+                color: scheme.primary,
+                minHeight: 4,
+                borderRadius: BorderRadius.zero,
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "XP PROGRESS",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: scheme.primary.withAlpha(128),
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
                   ),
-                )
+                  Text(
+                    "$currentXP / $totalXPForLevel",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: scheme.primary,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
             ],
           ),
-        )
+        ),
       ),
-      actionsPadding: EdgeInsetsDirectional.symmetric(horizontal: 10),
+      actionsPadding:
+          const EdgeInsetsDirectional.symmetric(horizontal: 16),
       actions: [
-        Text(
-          "${player.getLevel()} lvl",
-          style: TextStyle(
-            fontSize: 24,
-            color: scheme.onPrimary,
-            fontWeight: FontWeight.w600
-
+        Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              border: Border.all(color: scheme.primary.withAlpha(51)),
+            ),
+            child: Text(
+              "LVL ${player.getLevel()}",
+              style: TextStyle(
+                fontSize: 16,
+                color: scheme.primary,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
+              ),
+            ),
           ),
-          )
+        )
       ],
-      titleTextStyle: TextStyle(
-        color: scheme.onPrimary,
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-      ),
-      backgroundColor: scheme.primary,
-      elevation: 1,
+      backgroundColor: Colors.black,
+      elevation: 0,
       centerTitle: false,
     );
   }
-  
+
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize =>
+      const Size.fromHeight(kToolbarHeight + 20);
 }

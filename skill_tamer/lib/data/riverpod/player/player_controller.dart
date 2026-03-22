@@ -52,7 +52,6 @@ class PlayerController extends StateNotifier<Player> {
 
       state = player.copyWith();
     } catch (_) {
-      // If local data is corrupted or incompatible, safely recover.
       Player recoveredPlayer = Player.empty().refreshMission().refreshSkills();
       state = recoveredPlayer.copyWith();
       _save();
@@ -83,8 +82,13 @@ class PlayerController extends StateNotifier<Player> {
   void _onTick() {
     if (state.isMissionExpierd()) _setState(player: state.refreshMission());
     if (state.areSkillsEmpty()) _setState(player: state.refreshSkills());
+    if(state.activeSession?.isFailed() == true) {
+      _setState(player: state.addSessionHistory());
+      _setState(player: state.stopSession(manual: false));
+    }
 
     _setState(player: state.copyWith(lastRefreshAt: DateTime.now().millisecondsSinceEpoch));
+    _save();
   }
 
   void upgradeSkill({
@@ -100,7 +104,7 @@ class PlayerController extends StateNotifier<Player> {
     _save();
   }
 
-  void stopSession({bool manual = false}) {
+  void stopSession({ required bool manual}) {
     _setState(player: state.addSessionHistory());
     _setState(player: state.stopSession(manual: manual));
     _save();
@@ -119,20 +123,18 @@ class PlayerController extends StateNotifier<Player> {
     _save();
   }
 
-  void useReward({required int rewardIndex, int? skillIndex}) {
-    _setState(
-        player:
-            state.useReward(rewardIndex: rewardIndex, skillIndex: skillIndex));
+  void useReward({required int rewardIndex, required int skillIndex}) {
+    _setState(player: state.useReward(rewardIndex: rewardIndex, skillIndex: skillIndex));
     _save();
   }
 
   void completeMissionResult({required bool success, Reward? reward}) {
     Player newPlayer = state.copyWith();
 
+    List<Reward> finalRewards = List.from(newPlayer.rewards);
+
     if (reward != null) {
-      List<Reward> newRewards = List.from(newPlayer.rewards);
-      newRewards.add(reward);
-      newPlayer = newPlayer.copyWith(rewards: newRewards);
+      finalRewards.add(reward);
     }
 
     int xpReward = 0;
@@ -140,8 +142,7 @@ class PlayerController extends StateNotifier<Player> {
       xpReward = newPlayer.calculateMissionXpReward(newPlayer.currentMission!);
       newPlayer = newPlayer.copyWith(xpGained: newPlayer.xpGained + xpReward);
     }
-    List<Reward> newRewards = List.from(newPlayer.rewards);
-    newRewards.removeWhere((r) =>
+    finalRewards.removeWhere((r) =>
         r.type == RewardType.temporaryAttributeBoost && r.isActive == true);
 
     final nextRefresh = DateTime.now().millisecondsSinceEpoch +
@@ -152,8 +153,7 @@ class PlayerController extends StateNotifier<Player> {
     newPlayer = newPlayer.copyWith(
       currentMission: updatedMission,
       nextMissionRefreshAt: nextRefresh,
-      totalSkillBoost: {},
-      rewards: newRewards,
+      rewards: finalRewards,
     );
 
     _setState(player: newPlayer);

@@ -62,7 +62,6 @@ class Player {
     Mission? currentMission,
     int? xpGained,
     int? nextMissionRefreshAt,
-    Map<SkillAttributeType,int>? totalSkillBoost,
     List<SessionHistory>? sessionsHistory,
   }) {
     return Player(
@@ -77,37 +76,51 @@ class Player {
     );
   }
 
+  static const int _baseXp = 1000;
+  static const double _growth = 1.12;
+  static const int _maxLevel = 50;
+
+  int _xpForLevel(int level) {
+    return (_baseXp * pow(_growth, level)).round();
+  }
+
   int getLevel() {
     int level = 0;
     int xpLeft = xpGained;
-    int xpForNext = 1000;
-    double growth = 1.12;
 
-    while (level < 50 && xpLeft >= xpForNext) {
-      xpLeft -= xpForNext;
+    while (level < _maxLevel) {
+      final needed = _xpForLevel(level);
+      if (xpLeft < needed) break;
+
+      xpLeft -= needed;
       level++;
-      xpForNext = (xpForNext * growth).round();
     }
+
     return level;
   }
 
   int _totalXPForLevel(int level) {
     int total = 0;
     for (int i = 0; i < level; i++) {
-      total += (1000 * pow(1.12, i)).round();
+      total += _xpForLevel(i);
     }
     return total;
   }
 
   int xpGainedForNextLevel() {
-    int level = getLevel();
-    int xpUsed = _totalXPForLevel(level);
+    final currentLevel = getLevel();
+    final xpUsed = _totalXPForLevel(currentLevel);
     return xpGained - xpUsed;
   }
 
   int xpToNextLevel() {
-    int level = getLevel();
-    int totalForNext = _totalXPForLevel(level + 1);
-    return totalForNext - xpGained;
+    final currentLevel = getLevel();
+
+    if (currentLevel >= _maxLevel) return 0;
+
+    final xpUsed = _totalXPForLevel(currentLevel);
+    final xpForNext = _xpForLevel(currentLevel);
+
+    return xpForNext - (xpGained - xpUsed);
   }
 }

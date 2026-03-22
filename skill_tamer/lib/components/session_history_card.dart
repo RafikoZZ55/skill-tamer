@@ -47,77 +47,88 @@ class SessionHistoryCard extends ConsumerWidget {
     return sessionHistory.duration ~/ 1000;
   }
 
-  _StatusUi _statusUi(SessionStatusType status) {
+  _StatusUi _statusUi(SessionStatusType status, ColorScheme scheme) {
     switch (status) {
       case SessionStatusType.fullyCompleted:
-        return const _StatusUi(label: "Fully completed", color: Colors.greenAccent);
+        return _StatusUi(label: "FULLY COMPLETED", color: scheme.primary);
       case SessionStatusType.completed:
-        return const _StatusUi(label: "Completed", color: Colors.lightBlueAccent);
+        return _StatusUi(label: "COMPLETED", color: scheme.primary.withAlpha(179));
       case SessionStatusType.abandoned:
-        return const _StatusUi(label: "Abandoned", color: Colors.orangeAccent);
+        return _StatusUi(label: "ABANDONED", color: scheme.primary.withAlpha(102));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final statusUi = _statusUi(sessionHistory.status);
+    final scheme = Theme.of(context).colorScheme;
+    final statusUi = _statusUi(sessionHistory.status, scheme);
     final completionRatio = _completionRatio();
 
     return Card(
-      elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Text(
-                  "${sessionHistory.skillType.icon} ${sessionHistory.skillType.name}",
-                  style: Theme.of(context).textTheme.titleMedium,
+                  "${sessionHistory.skillType.icon} ${sessionHistory.skillType.name.toUpperCase()}",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: scheme.primary,
+                    letterSpacing: 1.1,
+                  ),
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: statusUi.color.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: statusUi.color.withValues(alpha: 0.55)),
+                    border: Border.all(color: statusUi.color.withAlpha(128)),
                   ),
                   child: Text(
                     statusUi.label,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: statusUi.color,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: TextStyle(
+                      color: statusUi.color,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
-              "Duration: ${_formatDuration(sessionHistory.duration)}",
-              style: Theme.of(context).textTheme.bodyMedium,
+              "DURATION: ${_formatDuration(sessionHistory.duration).toUpperCase()}",
+              style: TextStyle(
+                fontSize: 12,
+                color: scheme.primary.withAlpha(179),
+                letterSpacing: 0.5,
+              ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
                 _InfoPill(
                   text:
-                      "Target ${sessionHistory.skillType.recommendedSessionDuration.inMinutes}m",
+                      "TARGET ${sessionHistory.skillType.recommendedSessionDuration.inMinutes}M",
                 ),
-                _InfoPill(text: "Completion ${_formatRatio(completionRatio)}"),
-                _InfoPill(text: "Base XP ~${_baseXpEstimate()}"),
+                _InfoPill(text: "PROGRESS ${_formatRatio(completionRatio)}"),
+                _InfoPill(text: "XP ~${_baseXpEstimate()}"),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
-              "Finished: ${_formatCompletedAt(sessionHistory.completedAt)}",
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+              "FINISHED: ${_formatCompletedAt(sessionHistory.completedAt)}",
+              style: TextStyle(
+                fontSize: 10,
+                color: scheme.primary.withAlpha(102),
+                letterSpacing: 0.5,
+              ),
             ),
           ],
         ),
@@ -133,15 +144,21 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(999),
+        color: scheme.primary.withAlpha(13),
+        border: Border.all(color: scheme.primary.withAlpha(26)),
       ),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.labelSmall,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: scheme.primary.withAlpha(179),
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }

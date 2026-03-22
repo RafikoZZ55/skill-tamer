@@ -9,14 +9,16 @@ const CompletedMissionInfo({ super.key });
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_outline, color: Colors.green),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.check_box_outlined, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Mission completed – waiting for refresh.',
+                        'MISSION COMPLETED – WAITING FOR REFRESH',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withAlpha(230),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                          letterSpacing: 1.1,
                         ),
                       ),
                     ),

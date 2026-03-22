@@ -14,8 +14,7 @@ class RedistributeAttributePoints extends Reward {
   );
 
   @override
-  Player activate({required Player player, int? skillIndex}) {
-    if(skillIndex == null) throw Error();
+  Player activate({required Player player, required int skillIndex}) {
     Player newPlayer = player.copyWith();
 
     List<Reward> newRewards = List.from(player.rewards);

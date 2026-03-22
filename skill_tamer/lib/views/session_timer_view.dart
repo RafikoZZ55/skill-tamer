@@ -205,12 +205,14 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
         children: [
           if (session != null) ...[
             Padding(
-              padding: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.only(bottom: 24),
               child: Text(
-                '${session.sessionSkill.icon} ${session.sessionSkill.name}',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
+                '${session.sessionSkill.icon} ${session.sessionSkill.name.toUpperCase()}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2.0,
+                  color: scheme.primary,
                 ),
               ),
             ),
@@ -220,9 +222,11 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
             children: [
               Text(
                 _format(_remaining),
-                style: const TextStyle(
-                  fontSize: 50,
+                style: TextStyle(
+                  fontSize: 64,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: -1,
+                  color: scheme.primary,
                 ),
               ),
               SizedBox(
@@ -230,73 +234,97 @@ class _SessionTimerViewState extends ConsumerState<SessionTimerView> {
                 height: 280,
                 child: CircularProgressIndicator(
                   value: progress.clamp(0, 1),
-                  strokeWidth: 18,
+                  strokeWidth: 4,
                   color: scheme.primary,
-                  backgroundColor: scheme.surfaceContainerHighest,
+                  backgroundColor: scheme.primary.withAlpha(26),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 60),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 35),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: (session == null &&
-                            (firstSelectedSkillId == null ||
-                                firstSelectedSkillId == 'none'))
+                            (firstSelectedSkillId == null || firstSelectedSkillId == 'none'))
                         ? null
                         : () {
                             if (session == null) {
                               final idx = int.tryParse(firstSelectedSkillId!);
-                              if (idx != null &&
-                                  idx >= 0 &&
-                                  idx < skills.length) {
+                              if (idx != null && idx >= 0 && idx < skills.length) {
                                 controller.createNewSession(
                                   skillType: skills[idx].type,
                                 );
                               }
-                            } else {
-                              controller.stopSession(manual: true);
-                            }
+                            } else {controller.stopSession(manual: true);}
                           },
-                    child: Text(session == null ? "Start" : "Stop"),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: scheme.primary,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      disabledBackgroundColor: scheme.primary.withAlpha(26),
+                      disabledForegroundColor: scheme.primary.withAlpha(77),
+                    ),
+                    child: Text(
+                      (session == null ? "START SESSION" : "TERMINATE SESSION").toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 SelectBottomList(
-                  titleTextStyle: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
+                  titleTextStyle: TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: scheme.primary.withAlpha(128)),
                   selectedTitleStyle: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.primary),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: scheme.primary),
                   data: selectableSkills,
                   selectedId: firstSelectedSkillId!,
-                  selectedTitle: getTitle(firstSelectedSkillId),
+                  selectedTitle: getTitle(firstSelectedSkillId).toUpperCase(),
                   onChange: (id, title) =>
                       setState(() => firstSelectedSkillId = id),
-                  isDisable: false,
+                  isDisable: session != null,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 if (session != null) SessionMultiplyerCard(),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 session != null
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
                             width: double.infinity,
-                            child: FilledButton(
+                            child: OutlinedButton(
                               onPressed: () => controller.updateSessionCheck(),
-                              child: const Text("Check Session"),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: scheme.primary, width: 1),
+                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: Text(
+                                "VALIDATE CONTEXT",
+                                style: TextStyle(color: scheme.primary, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                              ),
                             ),
                           ),
-                          Text(
-                            "  next check at : ${_format(Duration(milliseconds: (session.lastSessionCheck + AppDurations.sessionAbandonedCheckDuration.inMilliseconds) - DateTime.now().millisecondsSinceEpoch))}",
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              "NEXT VALIDATION IN: ${_format(Duration(milliseconds: (session.lastSessionCheck + AppDurations.sessionAbandonedCheckDuration.inMilliseconds) - DateTime.now().millisecondsSinceEpoch))}",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: scheme.primary.withAlpha(102),
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
                           ),
                         ],
                       )

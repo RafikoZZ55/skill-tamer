@@ -18,58 +18,42 @@ class _MissionCardState extends ConsumerState<MissionCard> {
     return SizedBox(
       width: double.infinity,
       child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.mission.type.name,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: scheme.onPrimaryContainer,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Container(
-                  height: 1.5,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        scheme.primary,
-                        scheme.primary.withAlpha(40),
-                      ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.mission.type.name.toUpperCase(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(
+                            letterSpacing: 1.5,
+                            color: scheme.primary,
+                          ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.mission.type.description,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: scheme.onPrimaryContainer.withAlpha(160),
-                        height: 1.5,
-                      ),
-                ),
-              ],
-            ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                height: 1.0,
+                color: scheme.primary.withAlpha(26),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                widget.mission.type.description.toUpperCase(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: scheme.primary.withAlpha(179),
+                      height: 1.6,
+                    ),
+              ),
+            ],
           ),
         ),
       ),

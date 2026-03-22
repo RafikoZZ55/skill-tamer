@@ -53,42 +53,41 @@ class _NextMissionCounterCardState
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF0C0C0C),
         border: Border.all(
-          color: Theme.of(context).colorScheme.secondary,
-          width: 1.5,
+          color: scheme.primary.withAlpha(51),
+          width: 1.0,
         ),
       ),
       child: Row(
         children: [
-          const Text(
-            '⏱️',
-            style: TextStyle(fontSize: 18),
-          ),
+          Icon(Icons.timer_outlined, color: scheme.primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Next Mission Ready In',
+                  'NEXT MISSION READY IN',
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: scheme.primary.withAlpha(128),
+                    letterSpacing: 1.1,
                   ),
                 ),
                 Text(
-                  _nextMissionRefreshTimer,
+                  _nextMissionRefreshTimer.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: scheme.primary,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ],

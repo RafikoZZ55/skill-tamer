@@ -113,6 +113,7 @@ class _MissionViewState extends ConsumerState<MissionView> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final player = ref.watch(playerProvider);
     final Mission? mission = player.currentMission;
     final List<Skill> skills = player.skills;
@@ -203,46 +204,41 @@ class _MissionViewState extends ConsumerState<MissionView> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFF0C0C0C),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    width: 1.5,
+                    color: scheme.primary.withAlpha(51),
+                    width: 1.0,
                   ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '✨',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    Icon(Icons.bolt, color: scheme.primary, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Active Boosts',
+                            'ACTIVE BOOSTS',
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onTertiaryContainer,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: scheme.primary,
+                              letterSpacing: 1.1,
                             ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
                             totalBoost.entries
                                 .where((e) => e.value > 0)
-                                .map((e) => '${e.key.name} +${e.value}')
+                                .map((e) => '${e.key.name.toUpperCase()} +${e.value}')
                                 .join(' • '),
                             style: TextStyle(
-                              fontSize: 13,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onTertiaryContainer,
+                              fontSize: 12,
+                              color: scheme.primary.withAlpha(179),
                               fontWeight: FontWeight.w500,
+                              letterSpacing: 0.5,
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
@@ -256,47 +252,58 @@ class _MissionViewState extends ConsumerState<MissionView> {
             SizedBox(
               height: 335,
               child: Card(
-                elevation: 2,
-                child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: SfCartesianChart(
-                    primaryXAxis: CategoryAxis(),
+                    backgroundColor: Colors.transparent,
+                    plotAreaBorderWidth: 0,
+                    primaryXAxis: CategoryAxis(
+                      labelStyle: TextStyle(color: scheme.primary.withAlpha(179), fontSize: 10),
+                      majorGridLines: const MajorGridLines(width: 0),
+                    ),
                     primaryYAxis: NumericAxis(
                       minimum: 0,
                       maximum: 10,
                       interval: 2,
+                      labelStyle: TextStyle(color: scheme.primary.withAlpha(179), fontSize: 10),
+                      majorGridLines: MajorGridLines(color: scheme.primary.withAlpha(26)),
                     ),
                     legend: Legend(
-                        isVisible: true, position: LegendPosition.bottom),
+                      isVisible: true,
+                      position: LegendPosition.bottom,
+                      textStyle: TextStyle(color: scheme.primary, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
                     tooltipBehavior: TooltipBehavior(enable: true),
                     series: <CartesianSeries>[
                       LineSeries<AttributeChartData, String>(
-                        name: 'Collected',
+                        name: 'COLLECTED',
                         dataSource: _chartData
                             .where((d) => d.series == 'Collected')
                             .toList(),
                         xValueMapper: (AttributeChartData data, _) =>
-                            data.attribute,
+                            data.attribute.toUpperCase(),
                         yValueMapper: (AttributeChartData data, _) =>
                             data.value,
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.5,
+                        color: Colors.white,
+                        width: 3,
                         markerSettings: const MarkerSettings(
-                            isVisible: true, width: 6, height: 6),
+                            isVisible: true, width: 6, height: 6, shape: DataMarkerType.rectangle),
                       ),
-                      if (_showRequired || mission.isComplete)
+                      if (_showRequired || (mission.isComplete))
                         LineSeries<AttributeChartData, String>(
-                          name: 'Required',
+                          name: 'REQUIRED',
                           dataSource: _chartData
                               .where((d) => d.series == 'Required')
                               .toList(),
                           xValueMapper: (AttributeChartData data, _) =>
-                              data.attribute,
+                              data.attribute.toUpperCase(),
                           yValueMapper: (AttributeChartData data, _) =>
                               data.value,
-                          color: Theme.of(context).colorScheme.error,
-                          width: 2.5,
+                          color: Colors.white.withAlpha(77),
+                          width: 2,
+                          dashArray: const <double>[5, 5],
                           markerSettings: const MarkerSettings(
-                              isVisible: true, width: 6, height: 6),
+                              isVisible: true, width: 6, height: 6, shape: DataMarkerType.rectangle),
                         ),
                     ],
                   ),
@@ -305,16 +312,19 @@ class _MissionViewState extends ConsumerState<MissionView> {
             ),
             SizedBox(
               width: double.infinity,
-              child: FilledButton.icon(
+              child: FilledButton(
                 onPressed: isAttemptDisabled ? null : attempt,
-                label: const Text(
-                  'Attempt Mission',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                ),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  disabledBackgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  backgroundColor: scheme.primary,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  disabledBackgroundColor: scheme.primary.withAlpha(26),
+                  disabledForegroundColor: scheme.primary.withAlpha(77),
+                ),
+                child: const Text(
+                  'ATTEMPT MISSION',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.5),
                 ),
               ),
             ),
@@ -324,7 +334,7 @@ class _MissionViewState extends ConsumerState<MissionView> {
               selectedTitleStyle: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.primary),
+                  color: scheme.primary),
               data: selectableSkills,
               selectedId: firstSelectedSkillId!,
               selectedTitle: getTitle(firstSelectedSkillId),
@@ -340,7 +350,7 @@ class _MissionViewState extends ConsumerState<MissionView> {
               selectedTitleStyle: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.primary),
+                  color: scheme.primary),
               data: selectableSkills,
               selectedId: secondSelectedSkillId!,
               selectedTitle: getTitle(secondSelectedSkillId),

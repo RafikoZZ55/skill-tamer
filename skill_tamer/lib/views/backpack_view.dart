@@ -23,16 +23,24 @@ class _BackpackViewState extends ConsumerState<BackpackView> {
       child: Column(
         children: [
           SegmentedButton<BackpackTab>(
+            style: SegmentedButton.styleFrom(
+              backgroundColor: Colors.black,
+              selectedBackgroundColor: Colors.white,
+              selectedForegroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              side: BorderSide(color: Colors.white.withAlpha(51)),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
             segments: const [
               ButtonSegment(
                 value: BackpackTab.skills,
-                label: Text("Skills"),
-                icon: Icon(Icons.auto_awesome),
+                label: Text("SKILLS", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                icon: Icon(Icons.auto_awesome, size: 16),
               ),
               ButtonSegment(
                 value: BackpackTab.rewards,
-                label: Text("Rewards"),
-                icon: Icon(Icons.card_giftcard),
+                label: Text("REWARDS", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                icon: Icon(Icons.card_giftcard, size: 16),
               ),
             ],
             selected: {_selectedTab},

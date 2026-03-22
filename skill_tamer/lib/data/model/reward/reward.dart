@@ -11,7 +11,7 @@ abstract class Reward {
     required this.type,
   });
   
-  Player activate({required Player player, int? skillIndex});
+  Player activate({required Player player, required int skillIndex});
 
   Reward copyWith({
   bool? isActive,

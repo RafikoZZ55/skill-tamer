@@ -4,6 +4,7 @@ import 'package:skill_tamer/data/model/reward/redistribute_attribute_points.dart
 import 'package:skill_tamer/data/model/reward/reward.dart';
 import 'package:skill_tamer/data/model/reward/temporary_attribute_boost.dart';
 import 'package:skill_tamer/data/model/reward/session_boost.dart';
+import 'package:skill_tamer/data/model/reward/instant_mission.dart';
 import 'package:skill_tamer/data/constant/app_durations.dart';
 import 'package:skill_tamer/data/riverpod/player/player_provider.dart';
 
@@ -16,247 +17,217 @@ class RewardCard extends ConsumerStatefulWidget {
 }
 
 class _RewardCardState extends ConsumerState<RewardCard> {
+
   @override
   Widget build(BuildContext context) {
-    final Reward reward = ref.watch(
+    final reward = ref.watch(
       playerProvider.select((p) => p.rewards[widget.rewardIndex]),
     );
+
     final controller = ref.read(playerProvider.notifier);
     final scheme = Theme.of(context).colorScheme;
 
+    final rewardType = reward.type;
+
+    final isActive = reward.isActive;
+
     return AnimatedContainer(
       duration: AppDurations.shortAnimationDuration,
+      padding: const EdgeInsets.all(1.0),
       decoration: BoxDecoration(
-        color:
-            reward.isActive ? scheme.primaryContainer : scheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: reward.isActive ? scheme.primary : scheme.outlineVariant,
-          width: reward.isActive ? 2.5 : 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: reward.isActive
-                ? scheme.primary.withAlpha(50)
-                : scheme.shadow.withAlpha(50),
-            blurRadius: reward.isActive ? 14 : 8,
-            offset: Offset(0, reward.isActive ? 6 : 2),
-            spreadRadius: reward.isActive ? 2 : 0,
-          ),
-        ],
+        color: isActive ? scheme.primary : Colors.transparent,
       ),
       child: Material(
-        color: Colors.transparent,
+        color: isActive ? const Color(0xFF111111) : const Color(0xFF0A0A0A),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: reward.isActive
+          onTap: isActive
               ? null
               : () async {
                   int? selectedSkillIndex;
-                  if (_shouldShowSkillPicker(reward)) {
-                    selectedSkillIndex = await _showSkillPickerDialog(
-                      context,
-                      ref,
-                    );
+                  if (reward is RedistributeAttributePoints) {
+                    selectedSkillIndex = await _showSkillPickerDialog(context, ref);
                     if (selectedSkillIndex == null) return;
                   }
 
                   controller.useReward(
                     rewardIndex: widget.rewardIndex,
-                    skillIndex: selectedSkillIndex,
+                    skillIndex: selectedSkillIndex ?? 0,
                   );
                 },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: _buildRewardContent(reward, scheme),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isActive ? Colors.black : scheme.primary.withAlpha(26),
+                width: 1,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _buildContent(reward, rewardType, scheme),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildRewardContent(Reward reward, ColorScheme scheme) {
-    if (reward is TemporaryAttributeBoost) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+  Widget _buildContent(
+      Reward reward,
+      rewardType,
+      ColorScheme scheme,
+      ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: scheme.primary.withAlpha(13),
+                border: Border.all(color: scheme.primary.withAlpha(26)),
+              ),
+              child: Text(
+                rewardType.icon,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    rewardType.name.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: scheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    rewardType.description,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: scheme.primary.withAlpha(128),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            if (reward.isActive)
               Container(
-                padding: const EdgeInsets.all(6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: scheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(8),
+                  color: scheme.primary,
                 ),
                 child: const Text(
-                  '⚡',
-                  style: TextStyle(fontSize: 16),
+                  "ACTIVE",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Attribute Boost',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      'Apply to all skills',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: scheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              if (reward.isActive)
-                Chip(
-                  label: const Text('Applied',
-                      style:
-                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
-                  backgroundColor: scheme.primary,
-                  labelStyle: TextStyle(color: scheme.onPrimary),
-                  side: BorderSide.none,
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
+              )
+          ],
+        ),
+
+        const SizedBox(height: 16),
+
+        if (reward is TemporaryAttributeBoost)
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: reward.attributesBoostAmount.entries.map((e) {
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: scheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: scheme.secondary.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Text(
-                  '${e.key.name} +${e.value}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: scheme.onSecondaryContainer,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+              return _chip(
+                scheme,
+                "${e.key.name.toUpperCase()} +${e.value}",
               );
             }).toList(),
           ),
-        ],
-      );
-    } else if (reward is SessionBoost) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: scheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  '📢',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Session Boost',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      'Apply to one skill',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: scheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              if (reward.isActive)
-                Chip(
-                  label: const Text('Active',
-                      style:
-                          TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
-                  backgroundColor: scheme.primary,
-                  labelStyle: TextStyle(color: scheme.onPrimary),
-                  side: BorderSide.none,
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: scheme.tertiaryContainer,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: scheme.tertiary.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Text(
-              'Multiplier: x${reward.sessionBoostMultiplyer.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: scheme.onTertiaryContainer,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      );
-    }
 
-    return Text(
-      reward.type.name,
-      style: const TextStyle(fontWeight: FontWeight.bold),
-      overflow: TextOverflow.ellipsis,
+        if (reward is SessionBoost)
+          _highlightBox(
+            scheme,
+            "XP MULTIPLIER X${reward.sessionBoostMultiplyer.toStringAsFixed(2)}",
+          ),
+
+        if (reward is RedistributeAttributePoints)
+          _highlightBox(
+            scheme,
+            "SELECT SKILL FOR REDISTRIBUTION",
+          ),
+
+        if (reward is InstantMission)
+          _highlightBox(
+            scheme,
+            "INSTANT MISSION REFRESH",
+          ),
+      ],
     );
   }
 
-  bool _shouldShowSkillPicker(Reward reward) {
-    return reward is RedistributeAttributePoints;
+  Widget _chip(ColorScheme scheme, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: scheme.primary.withAlpha(26),
+        border: Border.all(color: scheme.primary.withAlpha(51)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: scheme.primary,
+          letterSpacing: 1.0,
+        ),
+      ),
+    );
   }
 
-  Future<int?> _showSkillPickerDialog(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  Widget _highlightBox(ColorScheme scheme, String text) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: scheme.primary.withAlpha(13),
+        border: Border.all(color: scheme.primary.withAlpha(26)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: scheme.primary,
+          letterSpacing: 1.1,
+        ),
+      ),
+    );
+  }
+
+
+  Future<int?> _showSkillPickerDialog(BuildContext context,WidgetRef ref) async {
     final player = ref.read(playerProvider);
+
     return showDialog<int?>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero),
         title: const Text('Select Skill'),
         content: SizedBox(
           width: 300,
           child: ListView.builder(
+            shrinkWrap: true,
             itemCount: player.skills.length,
             itemBuilder: (context, index) {
               final skill = player.skills[index];
@@ -268,12 +239,6 @@ class _RewardCardState extends ConsumerState<RewardCard> {
             },
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
       ),
     );
   }

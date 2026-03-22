@@ -19,7 +19,7 @@ class TemporaryAttributeBoost extends TemporaryReward {
         );
 
   @override
-  Player activate({required Player player, int? skillIndex}) {
+  Player activate({required Player player, required int skillIndex}) {
     Player newPlayer = player.copyWith();
 
     List<Reward> newRewards = List.from(newPlayer.rewards);

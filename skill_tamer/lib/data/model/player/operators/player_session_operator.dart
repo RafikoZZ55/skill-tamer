@@ -53,7 +53,7 @@ extension PlayerSessionOperator on Player {
     return skill.getLevel() - currentLevel;
   }
 
-  Player stopSession({bool manual = false}) {
+  Player stopSession({ required bool manual}) {
     if (activeSession == null) return copyWith();
     Session? session = activeSession;
     int reward;
@@ -89,9 +89,7 @@ extension PlayerSessionOperator on Player {
   Player createNewSession({required SkillType skillType}) {
     Player updatedPlayer = this;
 
-    if (activeSession != null) {
-      updatedPlayer = updatedPlayer.stopSession();
-    }
+    if (activeSession != null) {updatedPlayer = updatedPlayer.stopSession(manual: true);}
     updatedPlayer = _generateSession(skillType: skillType);
 
     return updatedPlayer;
@@ -100,11 +98,11 @@ extension PlayerSessionOperator on Player {
   Player addSessionHistory(){
     if(activeSession == null) return copyWith();
     
-    late SessionStatusType status;
+    SessionStatusType status;
     
-    if(activeSession!.isAbandoned() == true) {status = SessionStatusType.completed; }
-    if(activeSession!.isFinished() == true) {status = SessionStatusType.fullyCompleted; }
-    if(activeSession!.isFailed() == true) {status = SessionStatusType.abandoned; }
+    if(activeSession!.isAbandoned() == true) {status = SessionStatusType.abandoned; }
+    else if(activeSession!.isFinished() == true) {status = SessionStatusType.fullyCompleted; }
+    else {status = SessionStatusType.completed; }
 
     SessionHistory newSessionHistory = SessionHistory(
       status: status,

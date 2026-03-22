@@ -21,119 +21,208 @@ class _SkillPageState extends ConsumerState<SkillPage> {
     PlayerController playerController = ref.read(playerProvider.notifier);
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(skill.type.name),
-        backgroundColor: scheme.onPrimary,
+        title: Text(skill.type.name.toUpperCase()),
+        backgroundColor: Colors.black,
+        elevation: 0,
         titleTextStyle: TextStyle(
-          fontSize: 25,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
+          letterSpacing: 2.0,
+          color: scheme.primary,
         ),
-        actionsPadding: EdgeInsets.all(8),
+        iconTheme: IconThemeData(color: scheme.primary),
+        actionsPadding: const EdgeInsets.only(right: 16),
         actions: [
           Container(
             decoration: BoxDecoration(
-              color: scheme.primary,
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: scheme.primary, width: 2),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              child: Text("lvl ${skill.getLevel()}",
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            child: Text(
+              "LVL ${skill.getLevel()}",
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: scheme.onPrimary,
-              ),
+                color: scheme.primary,
               ),
             ),
           )
         ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Flexible(child: Text(skill.type.description, style: TextStyle(fontSize: 12.5, fontStyle: FontStyle.italic))),
-                Text(skill.type.icon, style: TextStyle(fontSize: 100)),
-              ],
-            ),
-
-            Divider(),
-            LinearProgressIndicator(
-              value: skill.getXpForNextLevel() / skill.getNextLevelXp(),
-            ),
-            Text("${skill.getXpForNextLevel()} / ${skill.getNextLevelXp()}xp"),
-
-            Divider(),
-            ...List.generate(skill.attributes.length, (index) {
-              SkillAttributeType attributeType = skill.attributes.keys.toList()[index];
-              int level = skill.attributes[attributeType]!;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("${attributeType.name}: $level/10"),
-                      SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          iconSize: 16,
-                          style: IconButton.styleFrom(
-                            backgroundColor: scheme.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6),
+                  Expanded(
+                    child: Text(
+                      skill.type.description.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: scheme.primary.withAlpha(153),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    skill.type.icon,
+                    style: const TextStyle(fontSize: 80),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                   Text(
+                    "XP PROGRESSION",
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: scheme.primary, letterSpacing: 1.5),
+                  ),
+                  Text(
+                    "${skill.getXpForNextLevel()} / ${skill.getNextLevelXp()} XP",
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: scheme.primary.withAlpha(179)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.zero,
+                child: LinearProgressIndicator(
+                  value: skill.getXpForNextLevel() / skill.getNextLevelXp(),
+                  minHeight: 8,
+                  backgroundColor: scheme.primary.withAlpha(26),
+                  valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+              Text(
+                "ATTRIBUTES",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFF00FF41), letterSpacing: 2.0),
+              ),
+              const SizedBox(height: 8),
+              Container(height: 1, color: scheme.primary.withAlpha(51)),
+              const SizedBox(height: 8),
+              ...List.generate(skill.attributes.length, (index) {
+                SkillAttributeType attributeType = skill.attributes.keys.toList()[index];
+                int level = skill.attributes[attributeType]!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "${attributeType.name.toUpperCase()}: $level / 10",
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: scheme.primary),
+                        ),
+                        SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: (skill.unspentAttributePoints > 0 && level < 10)
+                                ? () => playerController.upgradeSkill(
+                                      skillIndex: widget.skillIndex,
+                                      attribute: attributeType,
+                                    )
+                                : null,
+                            icon: Icon(
+                              Icons.add_box_outlined,
+                              color: (skill.unspentAttributePoints > 0 && level < 10) ? scheme.primary : scheme.primary.withAlpha(51),
+                              size: 24,
                             ),
                           ),
-                          onPressed: (skill.unspentAttributePoints > 0 && level < 10)
-                              ? () => playerController.upgradeSkill(
-                                    skillIndex: widget.skillIndex,
-                                    attribute: attributeType,
-                                  )
-                              : null,
-                          icon: Icon(Icons.add, color: scheme.onPrimary),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
                     ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.zero,
+                      child: LinearProgressIndicator(
+                        value: level / 10,
+                        backgroundColor: scheme.primary.withAlpha(13),
+                        valueColor: AlwaysStoppedAnimation<Color>(scheme.primary.withAlpha(204)),
+                        minHeight: 4,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              }),
+              const SizedBox(height: 24),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: scheme.primary.withAlpha(51)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "AVAILABLE POINTS",
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: scheme.primary.withAlpha(128), letterSpacing: 1.5),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${skill.unspentAttributePoints}",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: scheme.primary),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _infoRow("RECOMMENDED DURATION", "${skill.type.recommendedSessionDuration.inMinutes} MIN",scheme),
                   const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: level / 10,
-                  ),
-                  const SizedBox(height: 10),
+                  _infoRow("XP MULTIPLIER", "X${skill.type.xpMultiplier}",scheme),
                 ],
-              ); 
-            }),
-            Text("points: ${skill.unspentAttributePoints}",
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-            ),
-            Divider(),
-            Text("session duration: ${skill.type.recommendedSessionDuration.inMinutes} minutes",
-              style: TextStyle(
-                color: scheme.primary,
-                fontStyle: FontStyle.italic,
               ),
-            ),
-            Text("session xp multiplyer: ${skill.type.xpMultiplier}",
-              style: TextStyle(
-                color: scheme.primary,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ],
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _infoRow(String label, String value, dynamic scheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: scheme.primary.withAlpha(102),
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: scheme.primary,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
     );
   }
 }
