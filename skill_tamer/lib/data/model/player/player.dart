@@ -53,6 +53,47 @@ class Player {
     );
   }
 
+  static Player initial() {
+    return Player(
+      nextMissionRefreshAt: DateTime.now().millisecondsSinceEpoch, 
+      xpGained: 0, 
+      skills: SkillType.values.map((e) => Skill(type: e, unspentAttributePoints: 2)).toList(), 
+      rewards: [
+        InstantMission(),
+        RedistributeAttributePoints(),
+        SessionBoost(sessionBoostMultiplyer: 0.3),
+        SessionBoost(sessionBoostMultiplyer: 0.5),
+        SessionBoost(sessionBoostMultiplyer: 0.7),
+        SessionBoost(sessionBoostMultiplyer: 0.1),
+        SessionBoost(sessionBoostMultiplyer: 0.4),
+        TemporaryAttributeBoost(attributesBoostAmount: {SkillAttributeType.cognitive: 2}),
+        TemporaryAttributeBoost(attributesBoostAmount: {SkillAttributeType.creative: 2}),
+        TemporaryAttributeBoost(attributesBoostAmount: {SkillAttributeType.social: 2}),
+      ], 
+      lastRefreshAt:  DateTime.now().millisecondsSinceEpoch, 
+      sessionsHistory: [
+        SessionHistory(
+          status: SessionStatusType.completed, 
+          duration: 1000 * 60 * 25, 
+          skillType: SkillType.archery, 
+          completedAt: DateTime.now().millisecondsSinceEpoch - 1000 * 60 * 60 * 5
+        ),
+        SessionHistory(
+          status: SessionStatusType.fullyCompleted, 
+          duration: 1000 * 60 * 90, 
+          skillType: SkillType.dancing, 
+          completedAt: DateTime.now().millisecondsSinceEpoch - 1000 * 60 * 60 * 9
+        ),
+        SessionHistory(
+          status: SessionStatusType.completed, 
+          duration: 1000 * 60 * 40, 
+          skillType: SkillType.archery, 
+          completedAt: DateTime.now().millisecondsSinceEpoch - 1000 * 60 * 60 * 10
+        ),
+      ]
+    );
+  }
+
   Player copyWith({
     Session? activeSession,
     bool activeSessionSet = false,

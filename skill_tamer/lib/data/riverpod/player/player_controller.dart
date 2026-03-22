@@ -41,10 +41,7 @@ class PlayerController extends StateNotifier<Player> {
       Player player;
 
       if (_playerBox.isEmpty || _playerBox.getAt(0) == null) {
-        Player newPlayer = Player.empty();
-        newPlayer = newPlayer.refreshMission();
-        newPlayer = newPlayer.refreshSkills();
-        player = newPlayer.copyWith();
+        player = Player.empty();
       } else {
         PlayerState? playerState = _playerBox.getAt(0);
         player = _playerMapper.fromState(playerState: playerState!);
@@ -52,8 +49,7 @@ class PlayerController extends StateNotifier<Player> {
 
       state = player.copyWith();
     } catch (_) {
-      Player recoveredPlayer = Player.empty().refreshMission().refreshSkills();
-      state = recoveredPlayer.copyWith();
+      state = Player.empty();
       _save();
     }
   }

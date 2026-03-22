@@ -1,4 +1,0 @@
-Analyzing skill_tamer...                                        
-
-warning - The value of the local variable 'scheme' isn't used - lib\components\session_multiplyer_card.dart:19:17 - unused_local_variable
-

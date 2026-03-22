@@ -108,7 +108,7 @@ class _SkillPageState extends ConsumerState<SkillPage> {
               const SizedBox(height: 32),
               Text(
                 "ATTRIBUTES",
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFF00FF41), letterSpacing: 2.0),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 0, 255, 213), letterSpacing: 2.0),
               ),
               const SizedBox(height: 8),
               Container(height: 1, color: scheme.primary.withAlpha(51)),
