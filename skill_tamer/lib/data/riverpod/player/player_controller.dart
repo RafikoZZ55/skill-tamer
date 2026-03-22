@@ -37,19 +37,26 @@ class PlayerController extends StateNotifier<Player> {
   }
 
   void _loadFromHive() {
-    Player player;
+    try {
+      Player player;
 
-    if (_playerBox.isEmpty || _playerBox.getAt(0) == null) {
-      Player newPlayer = Player.empty();
-      newPlayer = newPlayer.refreshMission();
-      newPlayer = newPlayer.refreshSkills();
-      player = newPlayer.copyWith();
-    } else {
-      PlayerState? playerState = _playerBox.getAt(0);
-      player = _playerMapper.fromState(playerState: playerState!);
+      if (_playerBox.isEmpty || _playerBox.getAt(0) == null) {
+        Player newPlayer = Player.empty();
+        newPlayer = newPlayer.refreshMission();
+        newPlayer = newPlayer.refreshSkills();
+        player = newPlayer.copyWith();
+      } else {
+        PlayerState? playerState = _playerBox.getAt(0);
+        player = _playerMapper.fromState(playerState: playerState!);
+      }
+
+      state = player.copyWith();
+    } catch (_) {
+      // If local data is corrupted or incompatible, safely recover.
+      Player recoveredPlayer = Player.empty().refreshMission().refreshSkills();
+      state = recoveredPlayer.copyWith();
+      _save();
     }
-
-    state = player.copyWith();
   }
 
   @override
