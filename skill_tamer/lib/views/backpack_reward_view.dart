@@ -16,15 +16,11 @@ class _BackpackRewardViewState extends ConsumerState<BackpackRewardView> {
   Widget build(BuildContext context) {
     List<Reward> rewards = ref.watch(playerProvider.select((p) => p.rewards));
 
-    return GridView.builder(
-      itemCount: rewards.length,
-       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 220,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.8,
-      ),     
-      itemBuilder: (context, index) => RewardCard(rewardIndex: index),
+    return ListView.separated(
+      itemCount: rewards.length,  
+       padding: EdgeInsetsGeometry.all(15),
+      separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 15), 
+      itemBuilder: (BuildContext context, int index) => RewardCard(rewardIndex: index),
     );
   }
 }
